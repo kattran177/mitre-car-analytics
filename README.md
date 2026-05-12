@@ -776,24 +776,6 @@ Additional documentation available in:
 
 ---
 
-## Authors & Citation
-
-**Project Lead:** Your Name (author)  
-**Role:** Research in LLM-assisted threat hunting via RAG pipelines
-
-**Citation:**
-```bibtex
-@project{threat_hunting_rag_2026,
-  title={LLM-Assisted Threat Hunting Pipeline},
-  author={Your Name},
-  year={2026},
-  howpublished={\url{https://github.com/yourusername/threat-hunting-rag}},
-  note={RAG pipeline generating actionable threat hunting artifacts from MITRE CAR}
-}
-```
-
----
-
 ## License
 
 This project is licensed under the MIT License - see [LICENSE](LICENSE) file for details.
