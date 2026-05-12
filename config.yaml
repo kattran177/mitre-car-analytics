@@ -1,0 +1,24 @@
+llm:
+  model: claude-sonnet-4-6       # use for final/quality outputs
+  dev_model: claude-haiku-4-5-20251001  # use during dev/testing to save tokens
+  max_tokens: 1024
+
+embeddings:
+  model: all-MiniLM-L6-v2        # local, free, no API calls
+
+chromadb:
+  persist_dir: ./chroma_db
+  collection_name: car_analytics
+
+retrieval:
+  n_results: 3                   # default number of analytics to retrieve
+  max_distance: 0.65             # cutoff: don't return results above this distance (tangential matches)
+  # distance guide: <0.4 excellent, 0.4-0.5 good, 0.5-0.65 acceptable, >0.65 tangential
+
+data:
+  raw_dir: ./data/raw
+  processed_dir: ./data/processed
+  car_repo_url: https://github.com/mitre-attack/car
+
+outputs:
+  dir: ./outputs
