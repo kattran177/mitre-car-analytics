@@ -122,13 +122,22 @@ def validate_siem_query(query: str) -> tuple[bool, list[str]]:
             issues.append("Mismatched parentheses in WHERE clause")
 
     # Check for undefined fields (common hallucinations)
+    # These are fields the LLM invents that don't exist in ANY Sysmon/Splunk/KQL schema.
+    # Only flag fields that are unambiguously wrong (not CIM-valid alternatives).
     hallucination_patterns = {
-        "process_parent": "Should be: parent_exe or process/create/parent_exe",
-        "event_timestamp": "Should be: timestamp or time field",
-        "event_id": "Should be: EventID or event code",
-        "command_args": "Should be: command_line or CommandLine",
-        "src_ip": "Should be: source_ip or src",
-        "dst_ip": "Should be: dest_ip or destination",
+        "process_parent": "Should be: ParentImage (Sysmon) or parent_process_name (CIM)",
+        "event_timestamp": "Should be: _time (Splunk) or TimeGenerated (KQL)",
+        "command_args": "Should be: CommandLine (Sysmon)",
+        "cmdline": "Should be: CommandLine (Sysmon)",
+        "process_command_line": "Should be: CommandLine (Sysmon) or ProcessCommandLine (KQL)",
+        "target_host": "Should be: ComputerName (Sysmon) or dest (CIM)",
+        "source_process": "Should be: SourceImage (Sysmon EventCode=10)",
+        "target_process": "Should be: TargetImage (Sysmon EventCode=10)",
+        "parent_process": "Should be: ParentImage (Sysmon) or parent_process_name (CIM)",
+        "file_name": "Should be: TargetFilename (Sysmon EventCode=11)",
+        "registry_key": "Should be: TargetObject (Sysmon EventCode=12/13/14)",
+        "registry_value": "Should be: Details (Sysmon EventCode=13)",
+        "process_path": "Should be: Image (full path, Sysmon)",
     }
 
     for bad_field, suggestion in hallucination_patterns.items():

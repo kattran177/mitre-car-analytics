@@ -9,6 +9,8 @@ System prompt + task-specific prompts for transforming CAR analytics into:
 5. False positive analyses
 """
 
+from pathlib import Path
+
 # CAR Data Model schema reference extracted from corpus
 CAR_DATA_MODEL_REFERENCE = """
 CAR Data Model (https://car.mitre.org/data_model/)
@@ -31,6 +33,41 @@ Field naming conventions:
 IMPORTANT: Only reference fields that actually exist in the data model above.
 Do not invent field names like 'process_args', 'cmdline', 'ParentImage', etc.
 When uncertain, annotate confidence level.
+"""
+
+# Mapping from CAR abstract data model fields to real Sysmon/Splunk field names.
+# This eliminates the #1 cause of SIEM query failures: the LLM guessing field names.
+CAR_TO_SIEM_FIELD_MAP = """
+## CAR Data Model → Sysmon/Splunk Field Mapping
+
+When generating SIEM queries, translate CAR abstract fields to platform-native names:
+
+| CAR Field | Sysmon (EventCode=1) | Splunk CIM | KQL (DeviceProcessEvents) |
+|-----------|---------------------|------------|---------------------------|
+| process/create/exe | Image | process_name | FileName |
+| process/create/parent_exe | ParentImage | parent_process_name | InitiatingProcessFileName |
+| process/create/command_line | CommandLine | process | ProcessCommandLine |
+| process/create/hostname | ComputerName | dest | DeviceName |
+| process/create/image_path | Image (full path) | process_path | FolderPath |
+| process/create/ppid | ParentProcessId | parent_process_id | InitiatingProcessId |
+| file/create/file_path | TargetFilename | file_path | FolderPath |
+| file/create/image_path | Image | process_path | InitiatingProcessFileName |
+| network_connection/create/source_ip | SourceIp | src_ip | LocalIP |
+| network_connection/create/destination_ip | DestinationIp | dest_ip | RemoteIP |
+| network_connection/create/destination_port | DestinationPort | dest_port | RemotePort |
+| registry/set/registry_key_name | TargetObject | registry_path | RegistryKey |
+| module/load/module_path | ImageLoaded | loaded_file | FileName |
+
+Common Sysmon EventCodes:
+- EventCode=1: Process Create
+- EventCode=3: Network Connection
+- EventCode=7: Image Loaded (DLL)
+- EventCode=10: Process Access
+- EventCode=11: File Create
+- EventCode=12/13/14: Registry events
+
+CRITICAL: Use the Sysmon column for Splunk queries against Sysmon data.
+Use index=__your_sysmon_index__ as placeholder (not index=main).
 """
 
 SYSTEM_PROMPT = f"""You are a threat hunting expert and security analyst helping to transform MITRE CAR (Cyber Analytics Repository) detection analytics into actionable threat hunting artifacts.
@@ -790,11 +827,32 @@ FP_EXAMPLES = [FP_EXAMPLE_1, FP_EXAMPLE_2, FP_EXAMPLE_3]
 
 # Phase 4: Schema-grounded unified prompt builder
 
+def _load_reference_implementations() -> dict[str, dict[str, str]]:
+    """Load reference implementations from pre-processed JSON (cached)."""
+    ref_path = Path(__file__).parent.parent / "data" / "processed" / "reference_implementations.json"
+    if ref_path.exists():
+        import json
+        with open(ref_path, encoding="utf-8") as f:
+            return json.load(f)
+    return {}
+
+
+_REFERENCE_IMPLEMENTATIONS: dict[str, dict[str, str]] | None = None
+
+
+def _get_reference_implementations() -> dict[str, dict[str, str]]:
+    global _REFERENCE_IMPLEMENTATIONS
+    if _REFERENCE_IMPLEMENTATIONS is None:
+        _REFERENCE_IMPLEMENTATIONS = _load_reference_implementations()
+    return _REFERENCE_IMPLEMENTATIONS
+
+
 def build_schema_grounded_prompt(analytic: dict) -> str:
     """
     Build a Phase 4 unified prompt that grounds SIEM queries and false positives in the analytic's schema.
 
     Takes analytic dict and returns full prompt with schema constraints and FP guidance baked in.
+    Injects reference implementations (real Splunk/EQL code) when available.
     """
     # Build schema-grounded SIEM section
     data_model_list = analytic.get("data_model_references", [])
@@ -813,7 +871,28 @@ Valid CAR data_model_references for this analytic:
 These are the ONLY fields you may reference in your query.
 Before outputting, verify every field in your query is in this list above.
 If unsure, use NOT APPLICABLE rather than hallucinating a field name.
+
+{CAR_TO_SIEM_FIELD_MAP}
 """
+
+    # Inject real reference implementations when available — this is the single
+    # highest-impact improvement for SIEM query accuracy. The LLM adapts a working
+    # query instead of generating from abstract field descriptions.
+    refs = _get_reference_implementations()
+    analytic_id = analytic.get("id", "")
+    ref_section = ""
+    if analytic_id in refs:
+        impl = refs[analytic_id]
+        ref_parts = []
+        if "Pseudocode" in impl:
+            ref_parts.append(f"### Pseudocode (authoritative logic):\n```\n{impl['Pseudocode']}\n```")
+        if "Splunk" in impl:
+            ref_parts.append(f"### Reference Splunk Implementation (KNOWN WORKING):\n```spl\n{impl['Splunk']}\n```")
+        for platform in ("EQL", "LogPoint", "DNIF", "Sigma"):
+            if platform in impl:
+                ref_parts.append(f"### Reference {platform} Implementation:\n```\n{impl[platform]}\n```")
+        if ref_parts:
+            ref_section = "\n\n## REFERENCE IMPLEMENTATIONS (use these as basis for your SIEM query)\n\n" + "\n\n".join(ref_parts) + "\n\nIMPORTANT: Adapt the reference implementation above. Do NOT invent a new query from scratch when a working one exists. Fix placeholder index names and ensure syntax is complete.\n"
 
     # Build field grounding section for false positives
     fields_for_fp = ', '.join(data_model_list) if data_model_list else '(none)'
@@ -838,6 +917,7 @@ ATT&CK Techniques: {', '.join(analytic['techniques'])}
 Tactics: {', '.join(analytic['tactics'])}
 Data Model References: {', '.join(data_model_list) if data_model_list else '(none)'}
 Implementation Types: {', '.join(analytic['impl_types'])}
+{ref_section}
 """
 
     full_prompt = f"""{SYSTEM_PROMPT}
