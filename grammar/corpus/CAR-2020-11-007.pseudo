@@ -1,0 +1,6 @@
+processes = search Process:Create
+target_processes = filter processes where (
+  (exe="C:\\Windows\\System32\\net.exe" AND command_line="*delete*") OR
+  command_line="*Remove-SmbShare*" OR
+  comman_line="*Remove-FileShare*" )
+output target_processes

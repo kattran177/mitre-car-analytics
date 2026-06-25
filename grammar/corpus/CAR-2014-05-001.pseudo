@@ -1,0 +1,8 @@
+flows = search Flow:Start
+rpc_mapper = filter flows where (dest_port == 135)
+rpc_endpoint = filter flows where (dest_port >= 49152 and src_port >= 49152)
+rpc = join rpc_mapper, rpc_endpoint where (
+ (rpc_mapper.time < rpc_endpoint.time < rpc_mapper.time + 2 seconds) and
+ (rpc_mapper.src_ip == rpc_endpoint.src_ip and rpc_mapper.dest_ip == rpc_endpoint.dest_ip)
+)
+output rpc

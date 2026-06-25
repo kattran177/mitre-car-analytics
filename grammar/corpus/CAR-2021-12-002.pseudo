@@ -1,0 +1,5 @@
+processes = search Process:create
+logon_reg_processes = filter processes where (command_line CONTAINS("*reg*") AND command_line CONTAINS("*add*") AND command_line CONTAINS("*/d*") OR (command_line CONTAINS("*Set-ItemProperty*") AND command_line CONTAINS("*-value*")) AND command_line CONTAINS("*Common Startup*"))
+reg_keys = search Registry:value_edit
+logon_reg_keys = filter reg_keys where value="Common Startup"
+output logon_reg_processes, logon_reg_keys

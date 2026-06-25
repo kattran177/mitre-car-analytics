@@ -1,0 +1,9 @@
+processes = search Process:Create
+sniffer_processes = filter processes where (
+  exe = "tshark.exe" OR
+  exe = "windump.exe" OR
+  (exe = "logman.exe" AND parent_exe exists AND parent_exe!="C:\Program Files\Windows Event Reporting\Core\EventReporting.AgentService.exe") OR
+  exe = "tcpdump.exe" OR
+  exe = "wprui.exe" OR
+  exe = "wpr.exe" )
+output sniffer_processes

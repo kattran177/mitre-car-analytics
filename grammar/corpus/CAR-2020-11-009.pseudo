@@ -1,0 +1,3 @@
+processes = search Process:Create
+target_processes = filter processes where (exe="C:\Windows\syswow64\hh.exe" OR exe="C:\Windows\system32\hh.exe")
+output target_processes

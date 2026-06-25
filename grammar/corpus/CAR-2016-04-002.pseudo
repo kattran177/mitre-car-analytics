@@ -1,0 +1,2 @@
+([log_name] == "Security" and [event_code] in [1100, 1102, 1104]) or
+([log_name] == "System" and [event_code] == 104)

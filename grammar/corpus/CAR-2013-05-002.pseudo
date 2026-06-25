@@ -1,0 +1,8 @@
+processes = search Process:Create
+suspicious_locations = filter process where (
+ image_path == "*:\RECYCLER\*" or
+ image_path == "*:\SystemVolumeInformation\*" or
+ image_path == "%windir%\Tasks\*" or
+ image_path == "%systemroot%\debug\*"
+)
+output suspicious_locations

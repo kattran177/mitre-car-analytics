@@ -1,0 +1,5 @@
+files = search File:Create
+task_files = filter files where (
+  (file_path = "C:\Windows\System32\Tasks\*" or file_path = "C:\Windows\Tasks\*")  and
+  image_path != "C:\WINDOWS\system32\svchost.exe")
+output task_files

@@ -1,0 +1,8 @@
+modules = search Module:Load
+unsigned_modules = filter modules where (
+  (image_path == "C:\Windows\System32\regsvr32.exe" or image_path == "C:\Windows\SysWOW64\regsvr32.exe") and
+  signer == null and
+  module_path != "C:\Program Files*" and
+  module_path != "C:\Windows\*"
+)
+output unsigned_modules

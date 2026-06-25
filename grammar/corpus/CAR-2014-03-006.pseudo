@@ -1,0 +1,3 @@
+process = search Process:Create
+rundll32 = filter process where (exe == "rundll32.exe")
+output rundll32

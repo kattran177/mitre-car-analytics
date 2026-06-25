@@ -1,0 +1,9 @@
+processes = search Process:Create
+net_processes = filter processes where (
+  exe = "net.exe" AND (
+  command_line="*net* user*" OR
+  command_line="*net* group*" OR
+  command_line="*net* localgroup*" OR
+  command_line="*get-localgroup*" OR
+  command_line="*get-ADPrincipalGroupMembership*" )
+output net_processes

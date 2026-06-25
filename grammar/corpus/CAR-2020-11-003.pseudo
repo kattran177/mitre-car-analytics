@@ -1,0 +1,4 @@
+processes = search Process:Create
+mavinject_processes = filter processes where (
+  exe = "C:\\Windows\\SysWOW64\\mavinject.exe" OR Image="C:\\Windows\\System32\\mavinject.exe" OR command_line = "*/INJECTRUNNING*"
+output mavinject_processes

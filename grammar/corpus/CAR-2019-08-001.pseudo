@@ -1,0 +1,5 @@
+files = search File:Create
+lsass_dump = filter files where (
+  file_name = "lsass*.dmp"  and
+  image_path = "C:\Windows\*\taskmgr.exe")
+output lsass_dump

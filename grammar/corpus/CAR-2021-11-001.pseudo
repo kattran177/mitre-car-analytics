@@ -1,0 +1,5 @@
+processes = search Process:create
+safe_dll_search_processes = filter processes where command_line CONTAINS("*SafeDllSearchMode*") AND ((command_line CONTAINS("*reg*") AND command_line CONTAINS("*add*") AND command_line CONTAINS("*/d*")) OR (command_line CONTAINS("*Set-ItemProperty*") AND command_line CONTAINS(*-value*)) OR ((command_line CONTAINS("*00000000*") AND command_line CONTAINS(*0*)))
+reg_keys = search Registry:value_edit
+safe_dll_reg_keys = filter reg_keys where value="SafeDllSearchMode" AND value_data="0"
+output safe_dll_search_processes, safe_dll_reg_keys

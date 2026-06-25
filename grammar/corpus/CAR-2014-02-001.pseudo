@@ -1,0 +1,12 @@
+legitimate_installers = ["C:\windows\system32\msiexec.exe", "C:\windows\syswow64\msiexec.exe", ...]
+
+file_change = search File:Create,Modify
+process = search Process:Create
+service_process = filter processes where (parent_exe == "services.exe")
+modified_service = join (search, filter) where (
+ file_change.time < service_process.time and
+ file_change.file_path == service_process.image_path
+)
+
+modified_service = filter modified_service where (modified_service.file_change.image_path not in legitimate_installers)
+output modified_service

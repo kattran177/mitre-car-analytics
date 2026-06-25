@@ -1,0 +1,5 @@
+processes = search Process:Create
+ads_processes = filter processes where (
+exe == "control.exe OR appvlp.exe OR cmd.exe OR ftp.exe OR bash.exe OR mavinject.exe OR bitsadmin.exe" and command_line.matches("__some_regex__")
+)
+output ads_processes

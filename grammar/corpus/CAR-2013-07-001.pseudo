@@ -1,0 +1,9 @@
+process = search Process:Create
+port_fwd = filter process where (command_line match "-R .* -pw")
+scp = filter process where (command_line match "-pw .* .* .*@.*"
+mimikatz = filter process where (command_line match "sekurlsa")
+rar = filter process where (command_line match " -hp ")
+archive = filter process where (command_line match ".* a .*")
+ip_addr = filter process where (command_line match \d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})
+
+output port_fwd, scp, mimikatz, rar, archive, ip_addr

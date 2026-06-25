@@ -1,0 +1,5 @@
+flows = search Flow:Message
+winreg = filter flows where (dest_port == 445 and proto_info.pipe == "WINREG")
+winreg_modify = filter flows where (proto_info.function == "Create*" or proto_info.function == "SetValue*")
+
+output winreg_modify

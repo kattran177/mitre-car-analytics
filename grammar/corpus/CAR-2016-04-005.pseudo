@@ -1,0 +1,4 @@
+[EventCode] == 4624 and
+[AuthenticationPackageName] == 'Negotiate' and
+[Severity] == "Information" and
+[LogonType] == 10

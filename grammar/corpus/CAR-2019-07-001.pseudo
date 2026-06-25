@@ -1,0 +1,3 @@
+processes = search Process:Create
+chmod_processes = filter processes where command_line == "chmod *"
+output chmod_processes

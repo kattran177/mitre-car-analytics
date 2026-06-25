@@ -1,0 +1,14 @@
+processes = search Process:Create
+suspicious_processes = filter processes where (
+  (parent_exe == "w3wp.exe" OR
+   parent_exe == "httpd.exe" OR
+   parent_exe == "tomcat*.exe" OR
+   parent_exe == "nginx.exe" ) AND
+  (exe == "cmd.exe" OR
+   exe == "powershell.exe" OR
+   exe == "net.exe" OR
+   exe == "whoami.exe" OR
+   exe == "hostname.exe" OR
+   exe == "systeminfo.exe" OR
+   exe == "ipconfig.exe) )
+output suspicious_processes

@@ -1,0 +1,5 @@
+processes = search Process:Create
+target_processes = filter processes where (
+  (exe="C:\Program Files (x86)\Microsoft Visual Studio\*\bin\MSBuild.exe" OR exe="C:\Windows\Microsoft.NET\Framework*\msbuild.exe" OR exe="C:\users\*\appdata\roaming\microsoft\msxsl.exe") AND
+  image_path!="*Microsoft Visual Studio*")
+output target_processes

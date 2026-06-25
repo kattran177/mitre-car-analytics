@@ -1,0 +1,6 @@
+registry_keys = search (Registry:Create AND Registry:Remove AND Registry:Edit)
+appinit_keys = filter registry_keys where (
+  key = "*\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Windows\Appinit_Dlls\*" OR
+  key = "*\SOFTWARE\\Wow6432Node\Microsoft\Windows NT\CurrentVersion\Windows\Appinit_Dlls\*""
+  )
+output clsid_keys

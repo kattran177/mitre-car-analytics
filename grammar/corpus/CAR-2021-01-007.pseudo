@@ -1,0 +1,5 @@
+processes = search Process:Create
+target_processes = filter processes where (
+                   (exe="C:\\Windows\\System32\\sc.exe") AND (command_line="sc *config*" OR command_line="sc *stop*" OR command_line="sc *query*")
+                   )
+output target_processes

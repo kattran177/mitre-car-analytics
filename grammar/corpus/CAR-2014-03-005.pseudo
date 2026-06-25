@@ -1,0 +1,9 @@
+process = search Process:Create
+flow = search Flow:Start
+service = filter process where (parent_exe == "services.exe")
+remote_start = join (flow, service ) where (
+ flow.hostname == service.hostname and
+ flow.pid == service.pid and
+ (flow.time < service.time < flow.time + 1 second)
+)
+output remote_start

@@ -1,0 +1,3 @@
+processes = search Process:Create
+winlogon_cmd = filter processes where (parent_exe == "winlogon.exe" and exe == "cmd.exe")
+output winlogon_cmd

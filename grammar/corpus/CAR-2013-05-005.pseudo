@@ -1,0 +1,8 @@
+process = search Process:Create
+smb_write = run Analytic:CAR-2013-05-003
+remote_start = join (smb_write, process) where (
+ smb_write.hostname == process.hostname and
+ smb_write.file_path == process.image_path
+ (smb_write.time < process.time)
+)
+output remote_start

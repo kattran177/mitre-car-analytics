@@ -1,0 +1,6 @@
+processes = search Process:Create
+services = filter processes where (parent_image_path == "C:\Windows\System32\services.exe")
+historic_services = filter services (where timestamp < now - 1 day AND timestamp > now - 1 day)
+current_services = filter services (where timestamp >= now - 1 day)
+new_services = historic_services - current_services
+output new_services

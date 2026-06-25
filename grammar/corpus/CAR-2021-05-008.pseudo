@@ -1,0 +1,4 @@
+processes = search Process:Create
+certutil_downloads = filter processes where (
+  exe =”C:\Windows\System32\certutil.exe” AND command_line = * -exportPFX * )
+output certutil_downloads

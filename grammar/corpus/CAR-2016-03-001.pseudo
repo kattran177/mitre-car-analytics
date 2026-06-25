@@ -1,0 +1,13 @@
+process = search Process:Create
+info_command = filter process where (
+ exe == "hostname.exe" or
+ exe == "ipconfig.exe" or
+ exe == "net.exe" or
+ exe == "quser.exe" or
+ exe == "qwinsta.exe" or
+ exe == "sc" and (command_line match " query" or command_line match " qc")) or
+ exe == "systeminfo.exe" or
+ exe == "tasklist.exe" or
+ exe == "whoami.exe"
+)
+output info_command

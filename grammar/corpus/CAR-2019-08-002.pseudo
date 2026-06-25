@@ -1,0 +1,5 @@
+files = search File:Create
+ntds_dump = filter files where (
+  file_name = "ntds.dit"  and
+  image_path = "*ntdsutil.exe")
+output ntds_dump

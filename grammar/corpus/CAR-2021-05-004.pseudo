@@ -1,0 +1,4 @@
+processes = search Process:Create
+bitsadmin_commands = filter processes where (
+  exe ="C:\Windows\System32\bitsadmin.exe" AND command_line includes one of [*create*, *addfile*, *setnotifyflags*, *setnotifycmdline*, *setminretrydelay*, *setcustomheaders*,*resume*])
+output bitsadmin_commands

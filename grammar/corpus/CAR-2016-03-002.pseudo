@@ -1,0 +1,3 @@
+processes = search Process:Create
+wmic = filter processes where (exe == "wmic.exe" and command_line == "* process call create *" and command_line == "* /node:*")
+output wmic

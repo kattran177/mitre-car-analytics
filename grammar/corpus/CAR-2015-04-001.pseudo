@@ -1,0 +1,5 @@
+flows = search Flow:Message
+at_proto = filter flows where (dest_port == 445 and proto_info.pipe == "ATSVC")
+at_create = filter flows where (proto_info.function == "JobAdd")
+
+output at_create

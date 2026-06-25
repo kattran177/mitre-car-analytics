@@ -1,0 +1,1102 @@
+{
+  "summary": {
+    "total": 57,
+    "parsed": 29,
+    "translated": 29,
+    "exact": 0,
+    "semantic": 16,
+    "partial": 4,
+    "failed": 9,
+    "parse_errors": [
+      {
+        "car_id": "CAR-2013-07-001",
+        "error": "Line 3: Expected RPAREN(None) but got ID(mimikatz) | 'mimikatz'"
+      },
+      {
+        "car_id": "CAR-2013-10-001",
+        "error": "Line 2: Expected [ or ( for value list | ''"
+      },
+      {
+        "car_id": "CAR-2016-03-001",
+        "error": "Line 2: Unexpected token KEYWORD(or) | 'or'"
+      },
+      {
+        "car_id": "CAR-2016-04-002",
+        "error": "Line 1: Unexpected token LPAREN(() | '('"
+      },
+      {
+        "car_id": "CAR-2019-04-001",
+        "error": "Line 2: Expected RPAREN(None) but got ID(c) | 'c'"
+      },
+      {
+        "car_id": "CAR-2019-07-001",
+        "error": "Line 2: Expected LPAREN(None) but got ID(command_line) | 'command_line'"
+      },
+      {
+        "car_id": "CAR-2020-05-003",
+        "error": "Line 2: Expected RPAREN(None) but got ID(Comsvcs) | 'Comsvcs'"
+      },
+      {
+        "car_id": "CAR-2020-08-001",
+        "error": "Line 2: Expected RPAREN(None) but got LPAREN(() | '('"
+      },
+      {
+        "car_id": "CAR-2020-08-002",
+        "error": "Line 2: Expected RPAREN(None) but got LPAREN(() | '('"
+      },
+      {
+        "car_id": "CAR-2020-11-001",
+        "error": "Line 3: Expected RPAREN(None) but got KEYWORD(or) | 'or'"
+      },
+      {
+        "car_id": "CAR-2020-11-003",
+        "error": "Line 2: Expected RPAREN(None) but got KEYWORD(output) | 'output'"
+      },
+      {
+        "car_id": "CAR-2020-11-004",
+        "error": "Line 2: Expected RPAREN(None) but got KEYWORD(output) | 'output'"
+      },
+      {
+        "car_id": "CAR-2020-11-005",
+        "error": "Line 2: Unexpected token KEYWORD(or) | 'or'"
+      },
+      {
+        "car_id": "CAR-2020-11-006",
+        "error": "Line 2: Expected RPAREN(None) but got KEYWORD(output) | 'output'"
+      },
+      {
+        "car_id": "CAR-2020-11-010",
+        "error": "Line 2: Expected RBRACKET(None) but got DOT(.) | '.'"
+      },
+      {
+        "car_id": "CAR-2020-11-011",
+        "error": "Line 1: Unexpected token KEYWORD(or) | 'or'"
+      },
+      {
+        "car_id": "CAR-2021-02-002",
+        "error": "Line 2: Expected COLON(None) but got ID(suspicious_processes) | 'suspicious_processes'"
+      },
+      {
+        "car_id": "CAR-2021-04-001",
+        "error": "Line 1: Expected ID(None) but got STAR(*) | '*'"
+      },
+      {
+        "car_id": "CAR-2021-05-004",
+        "error": "Line 2: Expected RPAREN(None) but got ID(includes) | 'includes'"
+      },
+      {
+        "car_id": "CAR-2021-05-008",
+        "error": "Line 2: Expected value, got STAR(*) | '*'"
+      },
+      {
+        "car_id": "CAR-2021-05-010",
+        "error": "Line 2: Expected RPAREN(None) but got COLON(:) | ':'"
+      },
+      {
+        "car_id": "CAR-2021-05-011",
+        "error": "Line 2: Expected LPAREN(None) but got STRING(\"lsass\") | '\"lsass\"'"
+      },
+      {
+        "car_id": "CAR-2021-05-012",
+        "error": "Line 2: Expected LPAREN(None) but got ID(image_path) | 'image_path'"
+      },
+      {
+        "car_id": "CAR-2021-11-001",
+        "error": "Line 2: Expected LPAREN(None) but got ID(command_line) | 'command_line'"
+      },
+      {
+        "car_id": "CAR-2021-11-002",
+        "error": "Line 2: Expected LPAREN(None) but got ID(command_line) | 'command_line'"
+      },
+      {
+        "car_id": "CAR-2021-12-001",
+        "error": "Line 2: Expected LPAREN(None) but got ID(command_line) | 'command_line'"
+      },
+      {
+        "car_id": "CAR-2021-12-002",
+        "error": "Line 2: Expected STRING(None) but got LPAREN(() | '('"
+      },
+      {
+        "car_id": "CAR-2022-03-001",
+        "error": "Line 2: Expected STRING(None) but got LPAREN(() | '('"
+      }
+    ],
+    "parse_rate": 50.9,
+    "translate_rate": 100.0,
+    "accuracy": 55.2
+  },
+  "results": {
+    "CAR-2013-05-004": {
+      "car_id": "CAR-2013-05-004",
+      "parse": "OK",
+      "translate": "index=__your_sysmon_index__ EventCode=1\nImage=\"at.exe\"\n| table ComputerName, User, Image, ParentImage, CommandLine",
+      "score": {
+        "exact_match": false,
+        "field_match": true,
+        "field_overlap": 1.0,
+        "structure_match": false,
+        "score": 1,
+        "gen_fields": [
+          "CommandLine",
+          "ComputerName",
+          "EventCode",
+          "Image",
+          "ParentImage",
+          "User"
+        ],
+        "ref_fields": [
+          "CommandLine",
+          "ComputerName",
+          "Image"
+        ]
+      },
+      "reference": "index=__your_sysmon_index__ Image=\"C:\\\\Windows\\\\*\\\\at.exe\"|stats values(CommandLine) as \"Command Lines\" by ComputerName"
+    },
+    "CAR-2013-07-001": {
+      "car_id": "CAR-2013-07-001",
+      "parse": "FAIL: Line 3: Expected RPAREN(None) but got ID(mimikatz) | 'mimikatz'",
+      "translate": null,
+      "score": {
+        "score": 0,
+        "reason": "parse_error"
+      }
+    },
+    "CAR-2013-10-001": {
+      "car_id": "CAR-2013-10-001",
+      "parse": "FAIL: Line 2: Expected [ or ( for value list | ''",
+      "translate": null,
+      "score": {
+        "score": 0,
+        "reason": "parse_error"
+      }
+    },
+    "CAR-2014-04-003": {
+      "car_id": "CAR-2014-04-003",
+      "parse": "OK",
+      "translate": "index=__your_sysmon_index__ EventCode=1\nImage=\"powershell.exe\" ParentImage!=\"explorer.exe\"\n| table ComputerName, User, Image, ParentImage, CommandLine",
+      "score": {
+        "exact_match": false,
+        "field_match": true,
+        "field_overlap": 1.0,
+        "structure_match": true,
+        "score": 2,
+        "gen_fields": [
+          "CommandLine",
+          "ComputerName",
+          "EventCode",
+          "Image",
+          "ParentImage",
+          "User"
+        ],
+        "ref_fields": [
+          "CommandLine",
+          "ComputerName",
+          "EventCode",
+          "Image",
+          "ParentImage"
+        ]
+      },
+      "reference": "index=__your_sysmon_index__ EventCode=1 Image=\"C:\\\\Windows\\\\*\\\\powershell.exe\" ParentImage!=\"C:\\\\Windows\\\\explorer.exe\"|stats values(CommandLine) as \"Command Lines\" values(ParentImage) as \"Parent Images\" by ComputerName"
+    },
+    "CAR-2014-05-002": {
+      "car_id": "CAR-2014-05-002",
+      "parse": "OK",
+      "translate": "index=__your_sysmon_index__ EventCode=1\nImage=\"cmd.exe\" ParentImage=\"services.exe\"\n| table ComputerName, User, Image, ParentImage, CommandLine",
+      "score": {
+        "exact_match": false,
+        "field_match": true,
+        "field_overlap": 1.0,
+        "structure_match": true,
+        "score": 2,
+        "gen_fields": [
+          "CommandLine",
+          "ComputerName",
+          "EventCode",
+          "Image",
+          "ParentImage",
+          "User"
+        ],
+        "ref_fields": [
+          "EventCode",
+          "Image",
+          "ParentImage"
+        ]
+      },
+      "reference": "index=__your_sysmon_index__ EventCode=1 Image=\"C:\\\\Windows\\\\*\\\\cmd.exe\" ParentImage=\"C:\\\\Windows\\\\*\\\\services.exe\""
+    },
+    "CAR-2014-11-008": {
+      "car_id": "CAR-2014-11-008",
+      "parse": "OK",
+      "translate": "index=__your_sysmon_index__ EventCode=1\nParentImage=\"winlogon.exe\" Image=\"cmd.exe\"\n| table ComputerName, User, Image, ParentImage, CommandLine",
+      "score": {
+        "exact_match": false,
+        "field_match": true,
+        "field_overlap": 1.0,
+        "structure_match": true,
+        "score": 2,
+        "gen_fields": [
+          "CommandLine",
+          "ComputerName",
+          "EventCode",
+          "Image",
+          "ParentImage",
+          "User"
+        ],
+        "ref_fields": [
+          "EventCode",
+          "Image",
+          "ParentImage"
+        ]
+      },
+      "reference": "index=__your_sysmon_index__ EventCode=1 ParentImage=\"C:\\\\Windows\\\\*\\\\winlogon.exe\" Image=\"C:\\\\Windows\\\\*\\\\cmd.exe\""
+    },
+    "CAR-2016-03-001": {
+      "car_id": "CAR-2016-03-001",
+      "parse": "FAIL: Line 2: Unexpected token KEYWORD(or) | 'or'",
+      "translate": null,
+      "score": {
+        "score": 0,
+        "reason": "parse_error"
+      }
+    },
+    "CAR-2016-03-002": {
+      "car_id": "CAR-2016-03-002",
+      "parse": "OK",
+      "translate": "index=__your_sysmon_index__ EventCode=1\nImage=\"wmic.exe\" CommandLine=\"* process call create *\" CommandLine=\"* /node:*\"\n| table ComputerName, User, Image, ParentImage, CommandLine",
+      "score": {
+        "exact_match": false,
+        "field_match": true,
+        "field_overlap": 1.0,
+        "structure_match": true,
+        "score": 2,
+        "gen_fields": [
+          "CommandLine",
+          "ComputerName",
+          "EventCode",
+          "Image",
+          "ParentImage",
+          "User"
+        ],
+        "ref_fields": [
+          "CommandLine",
+          "EventCode",
+          "Image"
+        ]
+      },
+      "reference": "index=__your_sysmon_index__ EventCode=1 Image=\"C:\\\\Windows\\\\*\\\\wmic.exe\" CommandLine=\"* process call create *\"|search CommandLine=\"* /node:*\""
+    },
+    "CAR-2016-04-002": {
+      "car_id": "CAR-2016-04-002",
+      "parse": "FAIL: Line 1: Unexpected token LPAREN(() | '('",
+      "translate": null,
+      "score": {
+        "score": 0,
+        "reason": "parse_error"
+      }
+    },
+    "CAR-2019-04-001": {
+      "car_id": "CAR-2019-04-001",
+      "parse": "FAIL: Line 2: Expected RPAREN(None) but got ID(c) | 'c'",
+      "translate": null,
+      "score": {
+        "score": 0,
+        "reason": "parse_error"
+      }
+    },
+    "CAR-2019-04-002": {
+      "car_id": "CAR-2019-04-002",
+      "parse": "OK",
+      "translate": "index=__your_sysmon_index__ EventCode=7\n(Image=\"C:\\Windows\\System32\\regsvr32.exe\" OR Image=\"C:\\Windows\\SysWOW64\\regsvr32.exe\") Signed=\"\" ImageLoaded!=\"C:\\Program Files*\" ImageLoaded!=\"C:\\Windows\\*\"\n| table ComputerName, Image, ImageLoaded, Signed",
+      "score": {
+        "exact_match": false,
+        "field_match": true,
+        "field_overlap": 1.0,
+        "structure_match": true,
+        "score": 2,
+        "gen_fields": [
+          "ComputerName",
+          "EventCode",
+          "Image",
+          "ImageLoaded",
+          "Signed"
+        ],
+        "ref_fields": [
+          "ComputerName",
+          "EventCode",
+          "Image",
+          "ImageLoaded",
+          "Signed"
+        ]
+      },
+      "reference": "index=__your_sysmon_data__ EventCode=7 (Image=\"C:\\\\Windows\\\\System32\\\\regsvr32.exe\" OR Image=\"C:\\\\Windows\\\\SysWOW64\\\\regsvr32.exe\") Signed=false ImageLoaded!=\"C:\\\\Program Files*\" ImageLoaded!=\"C:\\\\Windows\\\\*\"|stats values(ComputerName) as \"Computer Name\" count(ImageLoaded) as ImageLoadedCount by ImageLoaded"
+    },
+    "CAR-2019-07-001": {
+      "car_id": "CAR-2019-07-001",
+      "parse": "FAIL: Line 2: Expected LPAREN(None) but got ID(command_line) | 'command_line'",
+      "translate": null,
+      "score": {
+        "score": 0,
+        "reason": "parse_error"
+      }
+    },
+    "CAR-2019-07-002": {
+      "car_id": "CAR-2019-07-002",
+      "parse": "OK",
+      "translate": "index=__your_sysmon_index__ EventCode=1\nImage=\"procdump*.exe\" CommandLine=\"*lsass*\"\n| table ComputerName, User, Image, ParentImage, CommandLine",
+      "score": {
+        "exact_match": false,
+        "field_match": false,
+        "field_overlap": 0.33,
+        "structure_match": false,
+        "score": 0,
+        "gen_fields": [
+          "CommandLine",
+          "ComputerName",
+          "EventCode",
+          "Image",
+          "ParentImage",
+          "User"
+        ],
+        "ref_fields": [
+          "EventCode",
+          "GrantedAccess",
+          "TargetImage"
+        ]
+      },
+      "reference": "index=__your_sysmon_index__ EventCode=10 TargetImage=\"C:\\\\WINDOWS\\\\system32\\\\lsass.exe\" GrantedAccess=\"0x1FFFFF\" (\"procdump\")"
+    },
+    "CAR-2019-08-001": {
+      "car_id": "CAR-2019-08-001",
+      "parse": "OK",
+      "translate": "index=__your_sysmon_index__ EventCode=11\nTargetFilename=\"lsass*.dmp\" Image=\"C:\\Windows\\*\\taskmgr.exe\"\n| table ComputerName, Image, TargetFilename",
+      "score": {
+        "exact_match": false,
+        "field_match": true,
+        "field_overlap": 1.0,
+        "structure_match": true,
+        "score": 2,
+        "gen_fields": [
+          "ComputerName",
+          "EventCode",
+          "Image",
+          "TargetFilename"
+        ],
+        "ref_fields": [
+          "EventCode",
+          "Image",
+          "TargetFilename"
+        ]
+      },
+      "reference": "index=__your_sysmon_index__ EventCode=11 TargetFilename=\"*lsass*.dmp\" Image=\"C:\\\\Windows\\\\*\\\\taskmgr.exe\""
+    },
+    "CAR-2019-08-002": {
+      "car_id": "CAR-2019-08-002",
+      "parse": "OK",
+      "translate": "index=__your_sysmon_index__ EventCode=11\nTargetFilename=\"ntds.dit\" Image=\"*ntdsutil.exe\"\n| table ComputerName, Image, TargetFilename",
+      "score": {
+        "exact_match": false,
+        "field_match": true,
+        "field_overlap": 1.0,
+        "structure_match": true,
+        "score": 2,
+        "gen_fields": [
+          "ComputerName",
+          "EventCode",
+          "Image",
+          "TargetFilename"
+        ],
+        "ref_fields": [
+          "EventCode",
+          "Image",
+          "TargetFilename"
+        ]
+      },
+      "reference": "index=__your_sysmon_index__ EventCode=11 TargetFilename=\"*ntds.dit\" Image=\"*ntdsutil.exe\""
+    },
+    "CAR-2020-05-003": {
+      "car_id": "CAR-2020-05-003",
+      "parse": "FAIL: Line 2: Expected RPAREN(None) but got ID(Comsvcs) | 'Comsvcs'",
+      "translate": null,
+      "score": {
+        "score": 0,
+        "reason": "parse_error"
+      }
+    },
+    "CAR-2020-08-001": {
+      "car_id": "CAR-2020-08-001",
+      "parse": "FAIL: Line 2: Expected RPAREN(None) but got LPAREN(() | '('",
+      "translate": null,
+      "score": {
+        "score": 0,
+        "reason": "parse_error"
+      }
+    },
+    "CAR-2020-08-002": {
+      "car_id": "CAR-2020-08-002",
+      "parse": "FAIL: Line 2: Expected RPAREN(None) but got LPAREN(() | '('",
+      "translate": null,
+      "score": {
+        "score": 0,
+        "reason": "parse_error"
+      }
+    },
+    "CAR-2020-09-001": {
+      "car_id": "CAR-2020-09-001",
+      "parse": "OK",
+      "translate": "index=__your_sysmon_index__ EventCode=11\n(TargetFilename=\"C:\\Windows\\System32\\Tasks\\*\" OR TargetFilename=\"C:\\Windows\\Tasks\\*\") Image!=\"C:\\WINDOWS\\system32\\svchost.exe\"\n| table ComputerName, Image, TargetFilename",
+      "score": {
+        "exact_match": false,
+        "field_match": true,
+        "field_overlap": 1.0,
+        "structure_match": true,
+        "score": 2,
+        "gen_fields": [
+          "ComputerName",
+          "EventCode",
+          "Image",
+          "TargetFilename"
+        ],
+        "ref_fields": [
+          "EventCode",
+          "Image",
+          "TargetFilename"
+        ]
+      },
+      "reference": "index=__your_sysmon_index__ EventCode=11 Image!=\"C:\\\\WINDOWS\\\\system32\\\\svchost.exe\" (TargetFilename=\"C:\\\\Windows\\\\System32\\\\Tasks\\\\\n*\" OR TargetFilename=\"C:\\\\Windows\\\\Tasks\\\\*\")"
+    },
+    "CAR-2020-09-002": {
+      "car_id": "CAR-2020-09-002",
+      "parse": "OK",
+      "translate": "index=__your_sysmon_index__ EventCode=13 OR EventCode=12\nTargetObject=\"*\\Software\\Classes\\CLSID\\*\"\n| table ComputerName, Image, TargetObject, Details",
+      "score": {
+        "exact_match": false,
+        "field_match": true,
+        "field_overlap": 1.0,
+        "structure_match": false,
+        "score": 1,
+        "gen_fields": [
+          "ComputerName",
+          "Details",
+          "EventCode",
+          "Image",
+          "TargetObject"
+        ],
+        "ref_fields": [
+          "EventCode",
+          "TargetObject"
+        ]
+      },
+      "reference": "index=__your_sysmon_index__ (EventCode=12 OR EventCode=13 OR EventCode=14) TargetObject=\"*\\\\Software\\\\Classes\\\\CLSID\\\\*\""
+    },
+    "CAR-2020-09-003": {
+      "car_id": "CAR-2020-09-003",
+      "parse": "OK",
+      "translate": "index=__your_sysmon_index__ EventCode=1\nImage=\"fltmc.exe\" CommandLine=\"*unload*\"\n| table ComputerName, User, Image, ParentImage, CommandLine",
+      "score": {
+        "exact_match": false,
+        "field_match": true,
+        "field_overlap": 1.0,
+        "structure_match": true,
+        "score": 2,
+        "gen_fields": [
+          "CommandLine",
+          "ComputerName",
+          "EventCode",
+          "Image",
+          "ParentImage",
+          "User"
+        ],
+        "ref_fields": [
+          "CommandLine",
+          "EventCode",
+          "Image"
+        ]
+      },
+      "reference": "index=client EventCode=1 CommandLine=\"*unload*\" (Image=\"C:\\\\Windows\\\\SysWOW64\\\\fltMC.exe\" OR Image=\"C:\\\\Windows\\\\System32\\\\fltMC.exe\")"
+    },
+    "CAR-2020-09-004": {
+      "car_id": "CAR-2020-09-004",
+      "parse": "OK",
+      "translate": "index=__your_sysmon_index__ EventCode=1\n(((((((CommandLine=\"*reg* query HKLM /f password /t REG_SZ /s*\" OR CommandLine=\"reg* query HKCU /f password /t REG_SZ /s\") OR CommandLine=\"*Get-UnattendedInstallFile*\") OR CommandLine=\"*Get-Webconfig*\") OR CommandLine=\"*Get-ApplicationHost*\") OR CommandLine=\"*Get-SiteListPassword*\") OR CommandLine=\"*Get-CachedGPPPassword*\") OR CommandLine=\"*Get-RegistryAutoLogon*\")\n| table ComputerName, User, Image, ParentImage, CommandLine",
+      "score": {
+        "exact_match": false,
+        "field_match": true,
+        "field_overlap": 1.0,
+        "structure_match": true,
+        "score": 2,
+        "gen_fields": [
+          "CommandLine",
+          "ComputerName",
+          "EventCode",
+          "Image",
+          "ParentImage",
+          "User"
+        ],
+        "ref_fields": [
+          "CommandLine",
+          "EventCode"
+        ]
+      },
+      "reference": "((index=__your_sysmon_index__ EventCode=1) OR (index=__your_win_syslog_index__ EventCode=4688)) (CommandLine=\"*reg* query HKLM /f password /t REG_SZ /s*\" OR CommandLine=\"reg* query HKCU /f password /t REG_SZ /s\" OR CommandLine=\"*Get-UnattendedInstallFile*\" OR CommandLine=\"*Get-Webconfig*\" OR CommandLine=\"*Get-ApplicationHost*\" OR CommandLine=\"*Get-SiteListPassword*\" OR CommandLine=\"*Get-CachedGPPPassword*\" OR CommandLine=\"*Get-RegistryAutoLogon*\")"
+    },
+    "CAR-2020-09-005": {
+      "car_id": "CAR-2020-09-005",
+      "parse": "OK",
+      "translate": "index=__your_sysmon_index__ EventCode=13 OR EventCode=12\n(TargetObject=\"*\\SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Windows\\Appinit_Dlls\\*\" OR TargetObject=\"*\\SOFTWARE\\\\Wow6432Node\\Microsoft\\Windows NT\\CurrentVersion\\Windows\\Appinit_Dlls\\*\")\n| table ComputerName, Image, TargetObject, Details",
+      "score": {
+        "exact_match": false,
+        "field_match": true,
+        "field_overlap": 1.0,
+        "structure_match": false,
+        "score": 1,
+        "gen_fields": [
+          "ComputerName",
+          "Details",
+          "EventCode",
+          "Image",
+          "TargetObject"
+        ],
+        "ref_fields": [
+          "EventCode",
+          "TargetObject"
+        ]
+      },
+      "reference": "index=__your_sysmon_index__ (EventCode=12 OR EventCode=13 OR EventCode=14) (TargetObject=\"*\\\\SOFTWARE\\\\Microsoft\\\\Windows NT\\\\CurrentVersion\\\\Windows\\\\Appinit_Dlls\\\\*\" OR TargetObject=\"*\\\\SOFTWARE\\\\Wow6432Node\\\\Microsoft\\\\Windows NT\\\\CurrentVersion\\\\Windows\\\\Appinit_Dlls\\\\*\")"
+    },
+    "CAR-2020-11-001": {
+      "car_id": "CAR-2020-11-001",
+      "parse": "FAIL: Line 3: Expected RPAREN(None) but got KEYWORD(or) | 'or'",
+      "translate": null,
+      "score": {
+        "score": 0,
+        "reason": "parse_error"
+      }
+    },
+    "CAR-2020-11-002": {
+      "car_id": "CAR-2020-11-002",
+      "parse": "OK",
+      "translate": "index=__your_sysmon_index__ EventCode=1\n(((((Image=\"tshark.exe\" OR Image=\"windump.exe\") OR Image=\"logman.exe\" ParentImage=* ParentImage!=\"C:\\Program Files\\Windows Event Reporting\\Core\\EventReporting.AgentService.exe\") OR Image=\"tcpdump.exe\") OR Image=\"wprui.exe\") OR Image=\"wpr.exe\")\n| table ComputerName, User, Image, ParentImage, CommandLine",
+      "score": {
+        "exact_match": false,
+        "field_match": true,
+        "field_overlap": 1.0,
+        "structure_match": true,
+        "score": 2,
+        "gen_fields": [
+          "CommandLine",
+          "ComputerName",
+          "EventCode",
+          "Image",
+          "ParentImage",
+          "User"
+        ],
+        "ref_fields": [
+          "EventCode",
+          "Image",
+          "ParentImage"
+        ]
+      },
+      "reference": "(index=__your_sysmon_index__ EventCode=1) (Image=\"*tshark.exe\" OR Image=\"*windump.exe\" OR (Image=\"*logman.exe\" AND ParentImage!=\"?\" AND ParentImage!=\"C:\\\\Program Files\\\\Windows Event Reporting\\\\Core\\\\EventReporting.AgentService.exe\") OR Image=\"*tcpdump.exe\" OR Image=\"*wprui.exe\" OR Image=\"*wpr.exe\")"
+    },
+    "CAR-2020-11-003": {
+      "car_id": "CAR-2020-11-003",
+      "parse": "FAIL: Line 2: Expected RPAREN(None) but got KEYWORD(output) | 'output'",
+      "translate": null,
+      "score": {
+        "score": 0,
+        "reason": "parse_error"
+      }
+    },
+    "CAR-2020-11-004": {
+      "car_id": "CAR-2020-11-004",
+      "parse": "FAIL: Line 2: Expected RPAREN(None) but got KEYWORD(output) | 'output'",
+      "translate": null,
+      "score": {
+        "score": 0,
+        "reason": "parse_error"
+      }
+    },
+    "CAR-2020-11-005": {
+      "car_id": "CAR-2020-11-005",
+      "parse": "FAIL: Line 2: Unexpected token KEYWORD(or) | 'or'",
+      "translate": null,
+      "score": {
+        "score": 0,
+        "reason": "parse_error"
+      }
+    },
+    "CAR-2020-11-006": {
+      "car_id": "CAR-2020-11-006",
+      "parse": "FAIL: Line 2: Expected RPAREN(None) but got KEYWORD(output) | 'output'",
+      "translate": null,
+      "score": {
+        "score": 0,
+        "reason": "parse_error"
+      }
+    },
+    "CAR-2020-11-007": {
+      "car_id": "CAR-2020-11-007",
+      "parse": "OK",
+      "translate": "index=__your_sysmon_index__ EventCode=1\n((Image=\"C:\\\\Windows\\\\System32\\\\net.exe\" CommandLine=\"*delete*\" OR CommandLine=\"*Remove-SmbShare*\") OR comman_line=\"*Remove-FileShare*\")\n| table ComputerName, User, Image, ParentImage, CommandLine",
+      "score": {
+        "exact_match": false,
+        "field_match": true,
+        "field_overlap": 1.0,
+        "structure_match": true,
+        "score": 2,
+        "gen_fields": [
+          "CommandLine",
+          "ComputerName",
+          "EventCode",
+          "Image",
+          "ParentImage",
+          "User"
+        ],
+        "ref_fields": [
+          "CommandLine",
+          "EventCode",
+          "Image"
+        ]
+      },
+      "reference": "(index=__your_sysmon_index__ EventCode=1) ((Image=\"C:\\\\Windows\\\\System32\\\\net.exe\" AND CommandLine=\"*delete*\") OR CommandLine=\"*Remove-SmbShare*\" OR CommandLine=\"*Remove-FileShare*\")"
+    },
+    "CAR-2020-11-008": {
+      "car_id": "CAR-2020-11-008",
+      "parse": "OK",
+      "translate": "index=__your_sysmon_index__ EventCode=1\n((Image=\"C:\\Program Files (x86)\\Microsoft Visual Studio\\*\\bin\\MSBuild.exe\" OR Image=\"C:\\Windows\\Microsoft.NET\\Framework*\\msbuild.exe\") OR Image=\"C:\\users\\*\\appdata\\roaming\\microsoft\\msxsl.exe\") Image!=\"*Microsoft Visual Studio*\"\n| table ComputerName, User, Image, ParentImage, CommandLine",
+      "score": {
+        "exact_match": false,
+        "field_match": true,
+        "field_overlap": 1.0,
+        "structure_match": true,
+        "score": 2,
+        "gen_fields": [
+          "CommandLine",
+          "ComputerName",
+          "EventCode",
+          "Image",
+          "ParentImage",
+          "User"
+        ],
+        "ref_fields": [
+          "EventCode",
+          "Image",
+          "ParentImage"
+        ]
+      },
+      "reference": "(index=__your_sysmon_index__ EventCode=1) (Image=\"C:\\\\Program Files (x86)\\\\Microsoft Visual Studio\\\\*\\\\bin\\\\MSBuild.exe\" OR Image=\"C:\\\\Windows\\\\Microsoft.NET\\\\Framework*\\\\msbuild.exe\" OR Image=\"C:\\\\users\\\\*\\\\appdata\\\\roaming\\\\microsoft\\\\msxsl.exe\") ParentImage!=\"*\\\\Microsoft Visual Studio*\")"
+    },
+    "CAR-2020-11-009": {
+      "car_id": "CAR-2020-11-009",
+      "parse": "OK",
+      "translate": "index=__your_sysmon_index__ EventCode=1\n(Image=\"C:\\Windows\\syswow64\\hh.exe\" OR Image=\"C:\\Windows\\system32\\hh.exe\")\n| table ComputerName, User, Image, ParentImage, CommandLine",
+      "score": {
+        "exact_match": false,
+        "field_match": true,
+        "field_overlap": 1.0,
+        "structure_match": true,
+        "score": 2,
+        "gen_fields": [
+          "CommandLine",
+          "ComputerName",
+          "EventCode",
+          "Image",
+          "ParentImage",
+          "User"
+        ],
+        "ref_fields": [
+          "EventCode",
+          "Image"
+        ]
+      },
+      "reference": "(index=__your_sysmon_index__ EventCode=1) (Image=\"C:\\\\Windows\\\\syswow64\\\\hh.exe\" OR Image=\"C:\\\\Windows\\\\system32\\\\hh.exe\")"
+    },
+    "CAR-2020-11-010": {
+      "car_id": "CAR-2020-11-010",
+      "parse": "FAIL: Line 2: Expected RBRACKET(None) but got DOT(.) | '.'",
+      "translate": null,
+      "score": {
+        "score": 0,
+        "reason": "parse_error"
+      }
+    },
+    "CAR-2020-11-011": {
+      "car_id": "CAR-2020-11-011",
+      "parse": "FAIL: Line 1: Unexpected token KEYWORD(or) | 'or'",
+      "translate": null,
+      "score": {
+        "score": 0,
+        "reason": "parse_error"
+      }
+    },
+    "CAR-2021-01-006": {
+      "car_id": "CAR-2021-01-006",
+      "parse": "OK",
+      "translate": "index=__your_sysmon_index__ EventCode=1\n((ParentImage=\"*excel.exe\" OR ParentImage=\"*word.exe\") OR ParentImage=\"*outlook.exe\") image=\"*.exe\"",
+      "score": {
+        "exact_match": false,
+        "field_match": false,
+        "field_overlap": 0.5,
+        "structure_match": false,
+        "score": 0,
+        "gen_fields": [
+          "EventCode",
+          "ParentImage",
+          "image"
+        ],
+        "ref_fields": [
+          "Image",
+          "ParentImage"
+        ]
+      },
+      "reference": "index = __your_sysmon__index__ (ParentImage=\"*excel.exe\" OR ParentImage=\"*word.exe\" OR ParentImage=\"*outlook.exe\") Image=\"*.exe\""
+    },
+    "CAR-2021-01-007": {
+      "car_id": "CAR-2021-01-007",
+      "parse": "OK",
+      "translate": "index=__your_sysmon_index__ EventCode=1\nImage=\"C:\\\\Windows\\\\System32\\\\sc.exe\" ((CommandLine=\"sc *config*\" OR CommandLine=\"sc *stop*\") OR CommandLine=\"sc *query*\")\n| table ComputerName, User, Image, ParentImage, CommandLine",
+      "score": {
+        "exact_match": false,
+        "field_match": true,
+        "field_overlap": 1.0,
+        "structure_match": true,
+        "score": 2,
+        "gen_fields": [
+          "CommandLine",
+          "ComputerName",
+          "EventCode",
+          "Image",
+          "ParentImage",
+          "User"
+        ],
+        "ref_fields": [
+          "CommandLine",
+          "EventCode",
+          "Image"
+        ]
+      },
+      "reference": "index= __your_sysmon__index__ EventCode=1 Image = \"C:\\\\Windows\\\\System32\\\\sc.exe\"  | regex CommandLine=\"^sc\\s*(config|stop|query)\\sWinDefend$\""
+    },
+    "CAR-2021-01-008": {
+      "car_id": "CAR-2021-01-008",
+      "parse": "OK",
+      "translate": "index=__your_sysmon_index__ EventCode=1\nParentImage=\"C:\\\\Windows\\\\System32\\\\cmd.exe\" CommandLine=\"reg.exe%HKLM\\\\SOFTWARE\\\\Microsoft\\\\Windows\\\\CurrentVersion\\\\Policies\\\\System%REG_DWORD /d 0%\"",
+      "score": {
+        "exact_match": false,
+        "field_match": true,
+        "field_overlap": 1.0,
+        "structure_match": false,
+        "score": 1,
+        "gen_fields": [
+          "CommandLine",
+          "EventCode",
+          "ParentImage"
+        ],
+        "ref_fields": [
+          "CommandLine",
+          "ParentImage"
+        ]
+      },
+      "reference": "sourcetype = __your_sysmon_index__ ParentImage = \"C:\\\\Windows\\\\System32\\\\cmd.exe\" | where like(CommandLine,\"reg.exe%HKLM\\\\SOFTWARE\\\\Microsoft\\\\Windows\\\\CurrentVersion\\\\Policies\\\\System%REG_DWORD /d 0%\")"
+    },
+    "CAR-2021-02-001": {
+      "car_id": "CAR-2021-02-001",
+      "parse": "OK",
+      "translate": "index=__your_sysmon_index__ EventCode=1\n(((ParentImage=\"w3wp.exe\" OR ParentImage=\"httpd.exe\") OR ParentImage=\"tomcat*.exe\") OR ParentImage=\"nginx.exe\") ((((((Image=\"cmd.exe\" OR Image=\"powershell.exe\") OR Image=\"net.exe\") OR Image=\"whoami.exe\") OR Image=\"hostname.exe\") OR Image=\"systeminfo.exe\") OR Image=\"ipconfig.exe\")\n| table ComputerName, User, Image, ParentImage, CommandLine",
+      "score": {
+        "exact_match": false,
+        "field_match": true,
+        "field_overlap": 1.0,
+        "structure_match": true,
+        "score": 2,
+        "gen_fields": [
+          "CommandLine",
+          "ComputerName",
+          "EventCode",
+          "Image",
+          "ParentImage",
+          "User"
+        ],
+        "ref_fields": [
+          "EventCode",
+          "Image",
+          "ParentImage"
+        ]
+      },
+      "reference": "(index=__your_sysmon_index__ EventCode=1)\n(ParentImage=\"C:\\\\Windows\\\\System32\\\\*w3wp.exe\" OR ParentImage=\"*httpd.exe\" OR ParentImage=\"*tomcat*.exe\" OR ParentImage=\"*nginx.exe\")\n(Image=\"C:\\\\Windows\\\\System32\\\\cmd.exe OR Image=\"C:\\\\Windows\\\\SysWOW64\\\\cmd.exe\" OR Image=\"C:\\\\Windows\\\\System32\\\\*\\\\powershell.exe OR Image=\"C:\\\\Windows\\SysWOW64\\\\*\\powershell.exe OR Image=\"C:\\\\Windows\\\\System32\\\\net.exe\" OR Image=\"C:\\\\Windows\\\\System32\\\\hostname.exe\" OR Image=\"C:\\\\Windows\\\\System32\\\\whoami.exe\" OR Image=\"*systeminfo.exe OR Image=\"C:\\\\Windows\\\\System32\\\\ipconfig.exe\")"
+    },
+    "CAR-2021-02-002": {
+      "car_id": "CAR-2021-02-002",
+      "parse": "FAIL: Line 2: Expected COLON(None) but got ID(suspicious_processes) | 'suspicious_processes'",
+      "translate": null,
+      "score": {
+        "score": 0,
+        "reason": "parse_error"
+      }
+    },
+    "CAR-2021-04-001": {
+      "car_id": "CAR-2021-04-001",
+      "parse": "FAIL: Line 1: Expected ID(None) but got STAR(*) | '*'",
+      "translate": null,
+      "score": {
+        "score": 0,
+        "reason": "parse_error"
+      }
+    },
+    "CAR-2021-05-001": {
+      "car_id": "CAR-2021-05-001",
+      "parse": "OK",
+      "translate": "index=__your_sysmon_index__ EventCode=1\nImage=\"C:\\Windows\\System32\\certutil.exe\" CommandLine=\"*-addstore*\"\n| table ComputerName, User, Image, ParentImage, CommandLine",
+      "score": {
+        "exact_match": false,
+        "field_match": false,
+        "field_overlap": 0.0,
+        "structure_match": false,
+        "score": 0,
+        "gen_fields": [
+          "CommandLine",
+          "ComputerName",
+          "EventCode",
+          "Image",
+          "ParentImage",
+          "User"
+        ],
+        "ref_fields": [
+          "user"
+        ]
+      },
+      "reference": "| tstats count min(_time) as firstTime values(Processes.process) as process max(_time) as lastTime from datamodel=Endpoint.Processes where Processes.process_name=*certutil* (Processes.process=*-addstore*) by Processes.parent_process Processes.process_name Processes.user"
+    },
+    "CAR-2021-05-002": {
+      "car_id": "CAR-2021-05-002",
+      "parse": "OK",
+      "translate": "index=__your_sysmon_index__\nextension=\".bat\" TargetFilename=\"C:\\Windows\\system32*\"\n| table ComputerName, Image, TargetFilename",
+      "score": {
+        "exact_match": false,
+        "field_match": false,
+        "field_overlap": 0.0,
+        "structure_match": false,
+        "score": 0,
+        "gen_fields": [
+          "ComputerName",
+          "Image",
+          "TargetFilename"
+        ],
+        "ref_fields": [
+          "user"
+        ]
+      },
+      "reference": "| tstats count min(_time) as firstTime max(_time) as lastTime values(Filesystem.dest) as dest values(Filesystem.file_name) as file_name values(Filesystem.user) as user from datamodel=Endpoint.Filesystem by Filesystem.file_path   | rex field=file_name \"(?<file_extension>\\.[^\\.]+)$\" | search file_path=*system32* AND file_extension=.bat"
+    },
+    "CAR-2021-05-003": {
+      "car_id": "CAR-2021-05-003",
+      "parse": "OK",
+      "translate": "index=__your_sysmon_index__ EventCode=1\nImage=\"C:\\Windows\\System32\\bcdedit.exe\" CommandLine=\"*recoveryenabled*\"\n| table ComputerName, User, Image, ParentImage, CommandLine",
+      "score": {
+        "exact_match": false,
+        "field_match": false,
+        "field_overlap": 0.0,
+        "structure_match": false,
+        "score": 0,
+        "gen_fields": [
+          "CommandLine",
+          "ComputerName",
+          "EventCode",
+          "Image",
+          "ParentImage",
+          "User"
+        ],
+        "ref_fields": [
+          "user"
+        ]
+      },
+      "reference": "| tstats count min(_time) as firstTime max(_time) as lastTime from datamodel=Endpoint.Processes where Processes.process_name = bcdedit.exe Processes.process=\"*recoveryenabled*\" (Processes.process=\"* no*\") by Processes.process_name Processes.process Processes.parent_process_name Processes.dest Processes.user"
+    },
+    "CAR-2021-05-004": {
+      "car_id": "CAR-2021-05-004",
+      "parse": "FAIL: Line 2: Expected RPAREN(None) but got ID(includes) | 'includes'",
+      "translate": null,
+      "score": {
+        "score": 0,
+        "reason": "parse_error"
+      }
+    },
+    "CAR-2021-05-005": {
+      "car_id": "CAR-2021-05-005",
+      "parse": "OK",
+      "translate": "index=__your_sysmon_index__ EventCode=1\nImage=\"C:\\Windows\\System32\\bitsadmin.exe\" CommandLine=\"*transfer*\"\n| table ComputerName, User, Image, ParentImage, CommandLine",
+      "score": {
+        "exact_match": false,
+        "field_match": false,
+        "field_overlap": 0.0,
+        "structure_match": false,
+        "score": 0,
+        "gen_fields": [
+          "CommandLine",
+          "ComputerName",
+          "EventCode",
+          "Image",
+          "ParentImage",
+          "User"
+        ],
+        "ref_fields": [
+          "user"
+        ]
+      },
+      "reference": "| tstats count min(_time) as firstTime max(_time) as lastTime from datamodel=Endpoint.Processes where Processes.process_name=bitsadmin.exe Processes.process=*transfer* by Processes.dest Processes.user Processes.parent_process Processes.process_name Processes.process Processes.process_id Processes.parent_process_id"
+    },
+    "CAR-2021-05-006": {
+      "car_id": "CAR-2021-05-006",
+      "parse": "OK",
+      "translate": "index=__your_sysmon_index__ EventCode=1\nImage=\"C:\\Windows\\System32\\certutil.exe\" CommandLine=\"*urlcache*\" CommandLine=\"*split*\"\n| table ComputerName, User, Image, ParentImage, CommandLine",
+      "score": {
+        "exact_match": false,
+        "field_match": false,
+        "field_overlap": 0.0,
+        "structure_match": false,
+        "score": 0,
+        "gen_fields": [
+          "CommandLine",
+          "ComputerName",
+          "EventCode",
+          "Image",
+          "ParentImage",
+          "User"
+        ],
+        "ref_fields": [
+          "user"
+        ]
+      },
+      "reference": "| tstats count min(_time) as firstTime max(_time) as lastTime from datamodel=Endpoint.Processes where Processes.process_name=certutil.exe Processes.process=*urlcache* Processes.process=*split* by Processes.dest Processes.user Processes.parent_process Processes.process_name Processes.process Processes.process_id Processes.parent_process_id"
+    },
+    "CAR-2021-05-007": {
+      "car_id": "CAR-2021-05-007",
+      "parse": "OK",
+      "translate": "index=__your_sysmon_index__ EventCode=1\nImage=\"C:\\Windows\\System32\\certutil.exe\" CommandLine=\"*verifyctl*\" CommandLine=\"*split*\"\n| table ComputerName, User, Image, ParentImage, CommandLine",
+      "score": {
+        "exact_match": false,
+        "field_match": false,
+        "field_overlap": 0.0,
+        "structure_match": false,
+        "score": 0,
+        "gen_fields": [
+          "CommandLine",
+          "ComputerName",
+          "EventCode",
+          "Image",
+          "ParentImage",
+          "User"
+        ],
+        "ref_fields": [
+          "user"
+        ]
+      },
+      "reference": "| tstats count min(_time) as firstTime max(_time) as lastTime from datamodel=Endpoint.Processes where Processes.process_name=certutil.exe Processes.process=*verifyctl* Processes.process=*split* by Processes.dest Processes.user Processes.parent_process Processes.process_name Processes.process Processes.process_id Processes.parent_process_id"
+    },
+    "CAR-2021-05-008": {
+      "car_id": "CAR-2021-05-008",
+      "parse": "FAIL: Line 2: Expected value, got STAR(*) | '*'",
+      "translate": null,
+      "score": {
+        "score": 0,
+        "reason": "parse_error"
+      }
+    },
+    "CAR-2021-05-009": {
+      "car_id": "CAR-2021-05-009",
+      "parse": "OK",
+      "translate": "index=__your_sysmon_index__ EventCode=1\nImage=\"C:\\Windows\\System32\\certutil.exe\" CommandLine=\"*decode*\"\n| table ComputerName, User, Image, ParentImage, CommandLine",
+      "score": {
+        "exact_match": false,
+        "field_match": false,
+        "field_overlap": 0.0,
+        "structure_match": false,
+        "score": 0,
+        "gen_fields": [
+          "CommandLine",
+          "ComputerName",
+          "EventCode",
+          "Image",
+          "ParentImage",
+          "User"
+        ],
+        "ref_fields": [
+          "user"
+        ]
+      },
+      "reference": "| tstats count min(_time) as firstTime max(_time) as lastTime from datamodel=Endpoint.Processes where Processes.process_name=certutil.exe Processes.process=*decode* by Processes.dest Processes.user Processes.parent_process Processes.process_name Processes.process Processes.process_id Processes.parent_process_id"
+    },
+    "CAR-2021-05-010": {
+      "car_id": "CAR-2021-05-010",
+      "parse": "FAIL: Line 2: Expected RPAREN(None) but got COLON(:) | ':'",
+      "translate": null,
+      "score": {
+        "score": 0,
+        "reason": "parse_error"
+      }
+    },
+    "CAR-2021-05-011": {
+      "car_id": "CAR-2021-05-011",
+      "parse": "FAIL: Line 2: Expected LPAREN(None) but got STRING(\"lsass\") | '\"lsass\"'",
+      "translate": null,
+      "score": {
+        "score": 0,
+        "reason": "parse_error"
+      }
+    },
+    "CAR-2021-05-012": {
+      "car_id": "CAR-2021-05-012",
+      "parse": "FAIL: Line 2: Expected LPAREN(None) but got ID(image_path) | 'image_path'",
+      "translate": null,
+      "score": {
+        "score": 0,
+        "reason": "parse_error"
+      }
+    },
+    "CAR-2021-11-001": {
+      "car_id": "CAR-2021-11-001",
+      "parse": "FAIL: Line 2: Expected LPAREN(None) but got ID(command_line) | 'command_line'",
+      "translate": null,
+      "score": {
+        "score": 0,
+        "reason": "parse_error"
+      }
+    },
+    "CAR-2021-11-002": {
+      "car_id": "CAR-2021-11-002",
+      "parse": "FAIL: Line 2: Expected LPAREN(None) but got ID(command_line) | 'command_line'",
+      "translate": null,
+      "score": {
+        "score": 0,
+        "reason": "parse_error"
+      }
+    },
+    "CAR-2021-12-001": {
+      "car_id": "CAR-2021-12-001",
+      "parse": "FAIL: Line 2: Expected LPAREN(None) but got ID(command_line) | 'command_line'",
+      "translate": null,
+      "score": {
+        "score": 0,
+        "reason": "parse_error"
+      }
+    },
+    "CAR-2021-12-002": {
+      "car_id": "CAR-2021-12-002",
+      "parse": "FAIL: Line 2: Expected STRING(None) but got LPAREN(() | '('",
+      "translate": null,
+      "score": {
+        "score": 0,
+        "reason": "parse_error"
+      }
+    },
+    "CAR-2022-03-001": {
+      "car_id": "CAR-2022-03-001",
+      "parse": "FAIL: Line 2: Expected STRING(None) but got LPAREN(() | '('",
+      "translate": null,
+      "score": {
+        "score": 0,
+        "reason": "parse_error"
+      }
+    }
+  }
+}

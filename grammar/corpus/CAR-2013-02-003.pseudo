@@ -1,0 +1,3 @@
+process = search Process:Create
+cmd = filter process where (exe == "cmd.exe")
+output cmd

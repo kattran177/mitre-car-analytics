@@ -3,19 +3,24 @@
 [![Status: Production Ready](https://img.shields.io/badge/Status-Production%20Ready-brightgreen)](https://github.com)
 [![Grade: B (82/100)](https://img.shields.io/badge/Grade-B%20(82%2F100)-yellowgreen)](https://github.com)
 [![Python 3.9+](https://img.shields.io/badge/Python-3.9%2B-blue)](https://www.python.org/)
-[![Claude API](https://img.shields.io/badge/LLM-Claude%20Sonnet%202.0-orange)](https://www.anthropic.com)
+[![Claude API](https://img.shields.io/badge/LLM-Claude%20Sonnet%204-orange)](https://www.anthropic.com)
 [![License: MIT](https://img.shields.io/badge/License-MIT-green)](LICENSE)
-[![Last Updated: 2026-04-30](https://img.shields.io/badge/Last%20Updated-2026--04--30-lightgrey)](https://github.com)
+[![Last Updated: 2026-06-25](https://img.shields.io/badge/Last%20Updated-2026--06--25-lightgrey)](https://github.com)
 
-Transform MITRE CAR (Cyber Analytics Repository) detection analytics into **actionable threat hunting artifacts** using a RAG pipeline powered by Claude LLMs. Generates 5 structured outputs per analytic: plain-English explanations, ATT&CK mappings, hunting hypotheses, SIEM queries, and false positive analysis.
+Transform MITRE CAR (Cyber Analytics Repository) detection analytics into **actionable threat hunting artifacts** using a hybrid pipeline: a **grammar-based deterministic transpiler** for SIEM query generation and a **RAG pipeline** powered by Claude LLMs for natural language outputs. Generates 5 structured outputs per analytic: plain-English explanations, ATT&CK mappings, hunting hypotheses, SIEM queries, and false positive analysis.
 
-**Status:** Fully operational with production-grade outputs, an interactive Streamlit UI, and quantified quality metrics (MOQS: 2.54/3.0).
+**Research Question:** To what extent can a retrieval-augmented generation pipeline reliably transform MITRE CAR analytics into actionable threat hunting outputs — specifically explanations, ATT&CK mappings, hunting hypotheses, and SIEM queries — and what are the systematic failure modes of such a system?
+
+**Gap Addressed:** Raw CAR YAML files are technically precise but cognitively demanding. LLMs offer a plausible mechanism for automating or augmenting this translation pipeline, producing structured, human-readable artifacts from machine-readable analytic definitions. This project quantifies where deterministic translation suffices and where LLM assistance is required.
+
+**Status:** Fully operational with production-grade outputs, an interactive Streamlit UI, a grammar-based SIEM transpiler, and quantified quality metrics (MOQS: 2.54/3.0).
 
 ---
 
 ## Table of Contents
 
 - [Features](#features)
+- [Grammar-Based Transpiler](#grammar-based-transpiler)
 - [Quick Start](#quick-start)
 - [Interactive UI](#interactive-ui)
 - [Pipeline Architecture](#pipeline-architecture)
@@ -38,11 +43,14 @@ Transform MITRE CAR (Cyber Analytics Repository) detection analytics into **acti
   - Testable threat hunting hypotheses
   - SIEM queries (Splunk SPL / KQL)
   - False positive analysis with triage filters
+- ✅ **Grammar-Based SIEM Transpiler** — deterministic pseudocode → Splunk translation
 - ✅ **RAG Pipeline** for context-aware generation
+- ✅ **Validation-Repair Loop** — auto-fixes SIEM query syntax errors
+- ✅ **Reference Implementation Injection** — LLM adapts known-good queries
 - ✅ **Quality Scoring** (MOQS: 2.54/3.0 - GOOD)
 - ✅ **Failure Mode Detection** (5 distinct modes identified)
 - ✅ **Interactive Streamlit UI** for exploring outputs
-- ✅ **Evaluated on 6 CAR analytics** with detailed metrics
+- ✅ **Evaluated on 57 CAR analytics** with detailed metrics
 
 ### Quality Metrics
 | Metric | Score | Status |
@@ -53,6 +61,75 @@ Transform MITRE CAR (Cyber Analytics Repository) detection analytics into **acti
 | **False Positives** | 2.80/3.0 | ✅ GOOD |
 | **Summary Explanation** | 2.60/3.0 | ✅ GOOD |
 | **SIEM Query** | 1.40/3.0 | ⚠️ NEEDS REVIEW |
+
+---
+
+## Grammar-Based Transpiler
+
+A deterministic pipeline that translates CAR pseudocode directly to Splunk SPL **without LLM involvement**:
+
+```
+CAR Pseudocode → Normalise → Parse (strict) → AST → Field Mapping → Splunk SPL
+```
+
+### How It Works
+
+1. **Normalise** (`grammar/normalise.py`): Fix inconsistencies in source pseudocode (case, quotes, operators)
+2. **Parse** (`grammar/parser.py`): Recursive-descent parser implementing a formal grammar (`CARPseudo.g4`)
+3. **Translate** (`grammar/translate.py`): Deterministic AST → Splunk using a field mapping lookup table
+
+### Transpiler Results (57 Test Pairs)
+
+| Metric | Value | Notes |
+|--------|-------|-------|
+| **Parse success rate** | 50.9% | 29/57 analytics parse deterministically |
+| **Translation accuracy** | 55.2% | Semantically equivalent to reference Splunk |
+| **Grammar rejections** | 49.1% | Rejected as ambiguous → flagged for LLM/human review |
+
+### Parse Failure Taxonomy
+
+| Category | Count | Cause |
+|----------|-------|-------|
+| Missing parentheses | 9 | Malformed source pseudocode |
+| Abbreviated syntax | 6 | Later CAR analytics omit `where` keyword |
+| Non-pseudocode format | 4 | Bare event-log conditions (no structure) |
+| Unquoted wildcards | 4 | `field = *pattern*` without quotes |
+| Source typos/bugs | 5 | Errors in original MITRE YAML files |
+
+### Key Research Finding
+
+> **51% of CAR pseudocode translates to Splunk without any LLM.** The translation step is 100% deterministic once parsing succeeds. The remaining 49% fails due to source-data quality issues — not translation complexity.
+
+### Example
+
+```
+INPUT (pseudocode):
+  process = search Process:Create
+  powershell = filter process where (exe == "powershell.exe" AND parent_exe != "explorer.exe")
+  output powershell
+
+OUTPUT (generated Splunk):
+  index=__your_sysmon_index__ EventCode=1
+  Image="powershell.exe" ParentImage!="explorer.exe"
+  | table ComputerName, User, Image, ParentImage, CommandLine
+```
+
+### Run the Transpiler
+
+```bash
+# Validate against corpus
+python3 -m grammar.validate
+
+# Use programmatically
+from grammar.normalise import normalise
+from grammar.parser import parse
+from grammar.translate import ast_to_splunk
+
+pseudocode = 'process = search Process:Create\ncmd = filter process where (exe == "cmd.exe")\noutput cmd'
+ast = parse(normalise(pseudocode))
+splunk = ast_to_splunk(ast)
+print(splunk)
+```
 
 ---
 
@@ -177,17 +254,28 @@ Selected CAR: CAR-2013-02-003 (Cmd.exe spawning from unusual parent)
     ┌────────────▼──────────────────────┐
     │  Phase 4: Prompt & Generation     │ (src/prompts.py)
     │  - Schema-grounded templates      │
+    │  - Reference impl injection       │
+    │  - CAR→Sysmon field mapping       │
     │  - Claude Sonnet 4-6 LLM          │
     │  - Temperature: 0.2 (stable)      │
     │  - 5 structured outputs           │
     └────────────┬──────────────────────┘
                  │
     ┌────────────▼──────────────────────┐
-    │  Phase 5: Validation & Evaluation │
+    │  Phase 5: Validation & Repair     │
     │  - JSON structure validation      │
     │  - SIEM query syntax check        │
+    │  - Validation-repair loop         │
     │  - Confidence scoring (MOQS)      │
     │  - Failure mode detection         │
+    └────────────┬──────────────────────┘
+                 │
+    ┌────────────▼──────────────────────┐
+    │  Grammar-Based Transpiler         │ (grammar/)
+    │  - Deterministic pseudocode parse │
+    │  - 51% coverage without LLM      │
+    │  - Field mapping lookup table     │
+    │  - Splunk SPL output              │
     └────────────┬──────────────────────┘
                  │
          ┌───────▼────────────┐
@@ -249,13 +337,27 @@ threat-hunting-rag/
 ├── streamlit_app.py                      # Interactive UI (Streamlit)
 ├── EDA_CAR_Corpus.ipynb                  # Exploratory data analysis reference
 │
+├── grammar/                              # Deterministic transpiler (no LLM)
+│   ├── CARPseudo.g4                      # Formal ANTLR4 grammar specification
+│   ├── normalise.py                      # Preprocessing (=→==, quotes, joins)
+│   ├── parser.py                         # Recursive-descent parser (strict)
+│   ├── translate.py                      # AST → Splunk SPL (field mapping)
+│   ├── validate.py                       # Corpus validation & comparison table
+│   ├── extract_corpus.py                 # Extract pseudocode from JSON
+│   ├── validation_results.json           # Per-analytic results
+│   └── corpus/                           # 90 pseudocode files + analysis
+│       ├── corpus_analysis.md            # Research findings & failure taxonomy
+│       ├── test_pairs.json               # 57 ground-truth pairs
+│       └── *.pseudo                      # Individual pseudocode files
+│
 ├── src/                                  # Core pipeline modules
 │   ├── __init__.py
 │   ├── config.py                         # Load config.yaml
 │   ├── ingest.py                         # Load & normalize CAR analytics
 │   ├── embed.py                          # Embedding & ChromaDB setup
 │   ├── retrieve.py                       # RAG retrieval with filtering
-│   ├── prompts.py                        # All 5 prompt templates
+│   ├── prompts.py                        # All 5 prompt templates + ref injection
+│   ├── query_repair.py                   # Validation-repair loop for SIEM queries
 │   ├── evaluate.py                       # JSON validation
 │   ├── query_validator.py                # SIEM query syntax checking
 │   ├── tactic_validator.py               # ATT&CK technique-tactic validation
@@ -273,7 +375,8 @@ threat-hunting-rag/
 │   └── 03_prompt_evaluation.ipynb        # Prompt testing & generation (Phases 3-4)
 │
 ├── data/                                 # Input data
-│   └── car_analytics.json                # MITRE CAR corpus (102 analytics)
+│   └── processed/
+│       └── reference_implementations.json # Real Splunk/EQL/LogPoint per CAR ID
 │
 ├── chroma_db/                            # Vector store (persistent)
 │   └── [ChromaDB embedding index files]
@@ -785,7 +888,7 @@ This project is licensed under the MIT License - see [LICENSE](LICENSE) file for
 ## Status & Roadmap
 
 **Current Status:** ✅ Production Ready (Phase 5 Complete)  
-**Last Updated:** 2026-04-30  
+**Last Updated:** 2026-06-25  
 **Grade:** B (82/100)  
 
 ### Roadmap
@@ -797,9 +900,11 @@ This project is licensed under the MIT License - see [LICENSE](LICENSE) file for
 | Phase 3: Prompt Design | ✅ Complete | 2026-04-26 |
 | Phase 4: Query Generation | ✅ Complete | 2026-04-29 |
 | Phase 5: Evaluation & Report | ✅ Complete | 2026-04-30 |
-| **Future: SIEM Query Refinement** | 🔄 Planned | Q3 2026 |
-| **Future: Real-time Generation API** | 🔄 Planned | Q3 2026 |
-| **Future: Community Model Fine-tuning** | 🔄 Planned | Q4 2026 |
+| Phase 6: Grammar-Based Transpiler | ✅ Complete | 2026-06-25 |
+| Phase 7: SIEM Query Accuracy Improvements | ✅ Complete | 2026-06-25 |
+| **Future: LLM-Assisted Normalisation** | 🔄 Planned | Q3 2026 |
+| **Future: Multi-Platform Translation (KQL/Sigma)** | 🔄 Planned | Q3 2026 |
+| **Future: Real-time Generation API** | 🔄 Planned | Q4 2026 |
 
 ---
 

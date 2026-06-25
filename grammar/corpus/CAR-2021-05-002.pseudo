@@ -1,0 +1,4 @@
+files = search File:create
+batch_files = filter files where (
+  extension =".bat" AND file_path = "C:\Windows\system32*" )
+output batch_files

@@ -1,0 +1,5 @@
+process = search Process:Create
+services = filter processes where (parent_exe == "services.exe")
+unquoted_services = filter services where (command_line != "\"*" and command_line == "* *")
+intercepted_service = filter unquoted_service where (image_path != "* *" and exe not in command_line)
+output intercepted_service

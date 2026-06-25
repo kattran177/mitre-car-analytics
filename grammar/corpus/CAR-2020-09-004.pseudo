@@ -1,0 +1,11 @@
+processes = search Process:Create
+  cred_processes = filter processes where (
+  command_line = "*reg* query HKLM /f password /t REG_SZ /s*" OR
+  command_line = "reg* query HKCU /f password /t REG_SZ /s" OR
+  command_line = "*Get-UnattendedInstallFile*" OR
+  command_line = "*Get-Webconfig*" OR
+  command_line = "*Get-ApplicationHost*" OR
+  command_line = "*Get-SiteListPassword*" OR
+  command_line = "*Get-CachedGPPPassword*" OR
+  command_line = "*Get-RegistryAutoLogon*")
+output cred_processes

@@ -1,0 +1,2 @@
+EventCode == 4624 and [target_user_name] != "ANONYMOUS LOGON" and
+[authentication_package_name] == "NTLM"

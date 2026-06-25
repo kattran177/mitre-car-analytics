@@ -1,0 +1,3 @@
+remote_threads = search Thread:remote_create
+lsass_remote_create = filter remote_threads where "lsass" in raw event
+output lsass_remote_create

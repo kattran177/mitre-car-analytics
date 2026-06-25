@@ -1,0 +1,4 @@
+processes = search Process:Create
+addstore_commands = filter processes where (
+  exe =”C:\Windows\System32\certutil.exe” AND command_line="*-addstore*” )
+output addstore_commands

@@ -1,0 +1,3 @@
+flows = search Flow:Message
+wmi_flow = filter flows where (dest_port == 135 and proto_info.rpc_interface == "IRemUnknown2")
+output wmi_flow

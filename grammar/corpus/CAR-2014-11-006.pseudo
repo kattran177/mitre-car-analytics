@@ -1,0 +1,4 @@
+flow = search Flow:Start
+winrm = filter flow where (dest_port == 5985)
+winrm_s = filter flow where (dest_port == 5986)
+output winrm, winrm_s

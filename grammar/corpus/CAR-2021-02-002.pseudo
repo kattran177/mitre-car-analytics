@@ -1,0 +1,7 @@
+processes = search Process
+suspicious_processes = filter processes where (
+  (image_path == "C:\Windows\System32\cmd.exe" OR
+   command_line == "*%COMSPEC%*") AND
+   command_line == "*echo*" AND
+   command_line == "*\pipe\*"))
+output suspicious_processes

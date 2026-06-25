@@ -1,0 +1,3 @@
+process = search Process:Create
+debuggers = filter process where (command_line match "$.* .*(sethc{{pipe}}utilman{{pipe}}osk{{pipe}}narrator{{pipe}}magnify)\.exe")
+output debuggers

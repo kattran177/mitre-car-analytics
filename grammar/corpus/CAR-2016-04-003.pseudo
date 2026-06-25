@@ -1,0 +1,4 @@
+log_name == "System" AND
+event_code == "7036"
+param1 in ["Windows Defender", "Windows Firewall"] AND
+param2 == "stopped"

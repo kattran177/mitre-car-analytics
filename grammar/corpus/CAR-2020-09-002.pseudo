@@ -1,0 +1,4 @@
+registry_keys = search (Registry:Create AND Registry:Remove AND Registry:Edit)
+clsid_keys = filter registry_keys where (
+  key = "*\Software\Classes\CLSID\*")
+output clsid_keys

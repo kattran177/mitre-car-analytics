@@ -1,0 +1,5 @@
+remote_thread = search Thread:RemoteCreate
+remote_thread = filter (start_function == "LoadLibraryA" or start_function == "LoadLibraryW")
+remote_thread = filter (src_image_path != "C:\Path\To\TrustedProgram.exe")
+
+output remote_thread

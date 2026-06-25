@@ -1,0 +1,4 @@
+processes = search Process:Create
+fltmc_processes = filter processes where (
+  exe = "fltmc.exe" AND command_line = "*unload*")
+output fltmc_processes

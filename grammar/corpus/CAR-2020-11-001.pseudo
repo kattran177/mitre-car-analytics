@@ -1,0 +1,7 @@
+processes = search Process:Create
+logon_script_key_processes = filter processes where (
+  command_line = "*reg*add*\Environment*UserInitMprLogonScript")
+registry = search (Registry:Add OR Registry:Edit)
+registry_logon_key_events = filter registry where (
+  key = "*\Environment*UserInitMprLogonScript")
+output (logon_script_key_processes, registry_logon_key_events)

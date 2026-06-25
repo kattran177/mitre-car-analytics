@@ -1,0 +1,5 @@
+processes = search Process:create
+logon_reg_processes = filter processes where command_line CONTAINS("*\\Microsoft\\Windows NT\\CurrentVersion\\Winlogon*") AND (command_line CONTAINS("*Userinit*") OR command_line CONTAINS("*Shell*") OR command_line CONTAINS("*Notify*")) AND (((command_line CONTAINS("*reg*") OR command_line CONTAINS("*add*") OR command_line CONTAINS("*/d*")) OR (command_line CONTAINS("*Set-ItemProperty*") OR command_line CONTAINS("*New-ItemProperty*") OR command_line CONTAINS("*-value*"))))
+reg_keys = search Registry:value_edit
+logon_reg_keys = filter reg_keys where (value="Userinit" OR value="Shell" OR value="Notify")
+output logon_reg_processes, logon_reg_keys

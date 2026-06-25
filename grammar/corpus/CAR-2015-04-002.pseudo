@@ -1,0 +1,7 @@
+flows = search Flow:Message
+schtasks_rpc = filter flows where (
+ src_port >= 49152 and dest_port >= 49152 and
+ proto_info.rpc_interface == "ITaskSchedulerService"
+)
+
+output schtasks_rpc

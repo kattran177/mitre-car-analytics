@@ -1,0 +1,14 @@
+processes = search Process:Create
+mismatch_processes = filter processes where ( parent_exe exists AND
+  (exe="smss.exe" AND (parent_exe!="smss.exe" AND parent_exe!="System") OR
+  (exe="csrss.exe" AND (parent_exe!="smss.exe" AND parent_exe!="svchost.exe")) OR
+  (exe="wininit.exe" AND parent_exe!="smss.exe") OR
+  (exe="winlogon.exe" AND parent_exe!="smss.exe") OR
+  (exe="lsass.exe" AND (parent_exe!="wininit.exe" AND parent_exe!="winlogon.exe")) OR
+  (exe="LogonUI.exe" AND (parent_exe!="winlogon.exe" AND parent_exe!="wininit.exe")) OR
+  (exe="services.exe" AND parent_exe!="wininit.exe") OR
+  (exe="spoolsv.exe" AND parent_exe!="services.exe") OR
+  (exe="taskhost.exe" AND (parent_exe!="services.exe" AND parent_exe!="svchost.exe")) OR
+  (exe="taskhostw.exe" AND (parent_exe!="services.exe" AND parent_exe!="svchost.exe")) OR
+  (exe="userinit.exe" AND (parent_exe!="dwm.exe" AND parent_exe!="winlogon.exe"))
+output mismatch_processes

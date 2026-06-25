@@ -1,0 +1,4 @@
+reg_events = search Registry:add or Registry:edit
+scr_reg_events = filter processes where (
+  key="*\\Software\\Policies\\Microsoft\\Windows\\Control Panel\\Desktop\\SCRNSAVE.EXE" AND
+output scr_reg_events
