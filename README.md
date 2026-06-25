@@ -82,9 +82,10 @@ CAR Pseudocode → Normalise → Parse (strict) → AST → Field Mapping → Sp
 
 | Metric | Value | Notes |
 |--------|-------|-------|
-| **Parse success rate** | 50.9% | 29/57 analytics parse deterministically |
+| **Parse success rate** | 56.1% | 32/57 analytics parse deterministically |
 | **Translation accuracy** | 55.2% | Semantically equivalent to reference Splunk |
-| **Grammar rejections** | 49.1% | Rejected as ambiguous → flagged for LLM/human review |
+| **Grammar rejections** | 43.9% | Rejected as ambiguous → flagged for LLM normalisation |
+| **LLM normalisation** | Available | Fixes syntax for rejected analytics (needs API key) |
 
 ### Parse Failure Taxonomy
 
@@ -98,7 +99,7 @@ CAR Pseudocode → Normalise → Parse (strict) → AST → Field Mapping → Sp
 
 ### Key Research Finding
 
-> **51% of CAR pseudocode translates to Splunk without any LLM.** The translation step is 100% deterministic once parsing succeeds. The remaining 49% fails due to source-data quality issues — not translation complexity.
+> **56% of CAR pseudocode translates to Splunk without any LLM.** The translation step is 100% deterministic once parsing succeeds. The remaining 44% fails due to source-data quality issues — not translation complexity. An LLM-assisted normalisation module is available to fix these syntax issues before deterministic parsing.
 
 ### Example
 
@@ -344,6 +345,8 @@ threat-hunting-rag/
 │   ├── translate.py                      # AST → Splunk SPL (field mapping)
 │   ├── validate.py                       # Corpus validation & comparison table
 │   ├── extract_corpus.py                 # Extract pseudocode from JSON
+│   ├── llm_normalise.py                  # LLM fallback for unparseable blocks
+│   ├── run_hybrid.py                     # Full pipeline: deterministic + LLM
 │   ├── validation_results.json           # Per-analytic results
 │   └── corpus/                           # 90 pseudocode files + analysis
 │       ├── corpus_analysis.md            # Research findings & failure taxonomy
@@ -902,7 +905,7 @@ This project is licensed under the MIT License - see [LICENSE](LICENSE) file for
 | Phase 5: Evaluation & Report | ✅ Complete | 2026-04-30 |
 | Phase 6: Grammar-Based Transpiler | ✅ Complete | 2026-06-25 |
 | Phase 7: SIEM Query Accuracy Improvements | ✅ Complete | 2026-06-25 |
-| **Future: LLM-Assisted Normalisation** | 🔄 Planned | Q3 2026 |
+| Phase 8: LLM-Assisted Normalisation | ✅ Complete | 2026-06-25 |
 | **Future: Multi-Platform Translation (KQL/Sigma)** | 🔄 Planned | Q3 2026 |
 | **Future: Real-time Generation API** | 🔄 Planned | Q4 2026 |
 

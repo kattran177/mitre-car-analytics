@@ -7,6 +7,10 @@ Handles the known inconsistencies in the corpus:
 - Missing parentheses in filter where clauses
 - Single = used as comparison (should be ==)
 - Multiline conditions (join into single logical line)
+- Missing closing parens before 'output'
+- Unquoted values (exe=svchost.exe → exe=="svchost.exe")
+- Non-standard operators (CONTAINS, includes, does not contain)
+- Wildcard data model refs (Process:* → Process:Create)
 """
 
 import re
@@ -33,13 +37,23 @@ def normalise(raw: str) -> str:
     text = re.sub(r'\bNOT\b', 'not', text)
     text = re.sub(r'\bIN\b', 'in', text)
 
-    # Normalise non-standard keywords
+    # Normalise non-standard operators/keywords
+    text = re.sub(r'\bCONTAINS\s*\(\s*"?([^")\s]+)"?\s*\)', r'match "\1"', text)
+    text = re.sub(r'\bCONTAINS\s*\(\s*([^)]+)\)', r'match "\1"', text)
     text = re.sub(r'\bCONTAINS\b', 'match', text)
+    text = re.sub(r'\bincludes\b', 'in', text)
+    text = re.sub(r'\bdoes not contain\b', '!=', text)
+
+    # Fix wildcard data model: Process:* → Process:Create
+    text = re.sub(r'(\w+):\*', r'\1:Create', text)
 
     # Fix missing 'where' in filter: "filter X (" → "filter X where ("
     text = re.sub(r'(filter\s+\w+)\s*\(', r'\1 where (', text)
 
-    # Fix single = used as comparison (but not in assignments like var = search)
+    # Fix filter without parens: "filter X where field..." → "filter X where (field...)"
+    text = _fix_filter_without_parens(text)
+
+    # Fix single = used as comparison (but not in assignments)
     text = _fix_comparison_equals(text)
 
     # Quote unquoted wildcard values AFTER == normalisation:
@@ -47,11 +61,18 @@ def normalise(raw: str) -> str:
     text = re.sub(r'(==\s*)\*([^"\s*][^"\s]*)\*', r'\1"*\2*"', text)
     text = re.sub(r'(==\s*)\*([^"\s]+)', r'\1"*\2"', text)
 
+    # Quote unquoted bare values: exe==svchost.exe → exe=="svchost.exe"
+    text = re.sub(r'(==\s*)([A-Za-z][A-Za-z0-9_.\\:]+\.exe)\b', r'\1"\2"', text)
+    text = re.sub(r'(!=\s*)([A-Za-z][A-Za-z0-9_.\\:]+\.exe)\b', r'\1"\2"', text)
+
     # Fix double-quote typos: parent_exe == "explorer.exe"")
     text = re.sub(r'"\)', '")', text.replace('"")', '")'))
 
     # Normalise bracket field notation [field] → field
     text = re.sub(r'\[(\w+)\]', r'\1', text)
+
+    # Fix missing closing paren before 'output' keyword
+    text = _fix_missing_close_paren(text)
 
     # Strip trailing whitespace per line
     text = "\n".join(line.rstrip() for line in text.split("\n"))
@@ -60,17 +81,11 @@ def normalise(raw: str) -> str:
 
 
 def _join_continuation_lines(text: str) -> str:
-    """Join lines that are continuations of a multiline expression.
-
-    A continuation line starts with whitespace followed by a condition fragment
-    (or/and, field comparison, closing paren).
-    """
+    """Join lines that are continuations of a multiline expression."""
     lines = text.split("\n")
     joined = []
     for line in lines:
         stripped = line.strip()
-        # Continuation: starts with or/and/OR/AND, or is just a closing paren,
-        # or is a condition fragment inside a filter (indented, not a keyword start)
         if joined and stripped and _is_continuation(stripped, joined[-1]):
             joined[-1] = joined[-1].rstrip() + " " + stripped
         else:
@@ -101,19 +116,58 @@ def _is_continuation(current: str, previous: str) -> bool:
     return False
 
 
-def _fix_comparison_equals(text: str) -> str:
-    """Replace single = with == inside where(...) clauses, but not in assignments.
+def _fix_filter_without_parens(text: str) -> str:
+    """Fix filters that have 'where' but conditions aren't wrapped in parens.
 
-    Strategy: find all 'where (' regions and fix = within them.
-    Also fix = inside filter conditions that lack 'where' keyword (later CAR style).
+    Pattern: filter X where command_line == "..." → filter X where (command_line == "...")
     """
+    lines = text.split("\n")
+    result = []
+    for line in lines:
+        # Match: filter VAR where FIELD (not followed by open paren)
+        m = re.match(r'^(\s*\w+\s*=\s*filter\s+\w+\s+where\s+)(?!\()(.+)$', line)
+        if m:
+            prefix, condition = m.groups()
+            # Wrap condition in parens if not already
+            if not condition.strip().startswith('('):
+                # Check if condition already ends with )
+                if condition.rstrip().endswith(')'):
+                    line = prefix + '(' + condition
+                else:
+                    line = prefix + '(' + condition + ')'
+        result.append(line)
+    return "\n".join(result)
+
+
+def _fix_missing_close_paren(text: str) -> str:
+    """Insert missing closing paren before 'output' when filter is unclosed.
+
+    Handles: filter X where (...conditions...\noutput X
+    Should be: filter X where (...conditions...)\noutput X
+    """
+    lines = text.split("\n")
+    result = []
+    for i, line in enumerate(lines):
+        stripped = line.strip()
+        # If this line starts with 'output' and previous line has unclosed parens
+        if stripped.startswith('output') and result:
+            prev = result[-1]
+            open_count = prev.count('(') - prev.count(')')
+            if open_count > 0:
+                # Add missing close parens to previous line
+                result[-1] = prev + ')' * open_count
+        result.append(line)
+    return "\n".join(result)
+
+
+def _fix_comparison_equals(text: str) -> str:
+    """Replace single = with == inside where(...) clauses, but not in assignments."""
     lines = text.split("\n")
     result = []
 
     for line in lines:
-        # Don't touch assignment lines (var = search/filter/join/group/from/run/...)
         if re.match(r'^\s*\w+\s*=\s*(search|filter|join|group|from|run)\b', line):
-            # But DO fix = inside the where(...) portion of filter lines
+            # Fix = inside the where(...) portion of filter lines
             where_idx = line.find('where')
             if where_idx > 0:
                 prefix = line[:where_idx]
@@ -125,14 +179,13 @@ def _fix_comparison_equals(text: str) -> str:
             # Set difference: var = a - b
             result.append(line)
         else:
-            # Continuation/condition lines — always fix = to ==
             result.append(_replace_single_equals(line))
 
     return "\n".join(result)
 
 
 def _replace_single_equals(text: str) -> str:
-    """Replace single = with == in text (but not != or == or <=  or >=)."""
+    """Replace single = with == in text (but not != or == or <= or >=)."""
     return re.sub(r'(?<![!=<>])=(?!=)', ' == ', text)
 
 

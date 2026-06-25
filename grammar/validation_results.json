@@ -1,12 +1,12 @@
 {
   "summary": {
     "total": 57,
-    "parsed": 29,
-    "translated": 29,
+    "parsed": 32,
+    "translated": 32,
     "exact": 0,
-    "semantic": 16,
+    "semantic": 18,
     "partial": 4,
-    "failed": 9,
+    "failed": 10,
     "parse_errors": [
       {
         "car_id": "CAR-2013-07-001",
@@ -27,10 +27,6 @@
       {
         "car_id": "CAR-2019-04-001",
         "error": "Line 2: Expected RPAREN(None) but got ID(c) | 'c'"
-      },
-      {
-        "car_id": "CAR-2019-07-001",
-        "error": "Line 2: Expected LPAREN(None) but got ID(command_line) | 'command_line'"
       },
       {
         "car_id": "CAR-2020-05-003",
@@ -77,53 +73,45 @@
         "error": "Line 2: Expected COLON(None) but got ID(suspicious_processes) | 'suspicious_processes'"
       },
       {
-        "car_id": "CAR-2021-04-001",
-        "error": "Line 1: Expected ID(None) but got STAR(*) | '*'"
-      },
-      {
         "car_id": "CAR-2021-05-004",
-        "error": "Line 2: Expected RPAREN(None) but got ID(includes) | 'includes'"
+        "error": "Line 2: Expected [ or ( for value list | ''"
       },
       {
         "car_id": "CAR-2021-05-008",
         "error": "Line 2: Expected value, got STAR(*) | '*'"
       },
       {
-        "car_id": "CAR-2021-05-010",
-        "error": "Line 2: Expected RPAREN(None) but got COLON(:) | ':'"
-      },
-      {
         "car_id": "CAR-2021-05-011",
-        "error": "Line 2: Expected LPAREN(None) but got STRING(\"lsass\") | '\"lsass\"'"
+        "error": "Line 2: Expected ID(None) but got STRING(\"lsass\") | '\"lsass\"'"
       },
       {
         "car_id": "CAR-2021-05-012",
-        "error": "Line 2: Expected LPAREN(None) but got ID(image_path) | 'image_path'"
+        "error": "Line 2: Expected value, got LBRACKET([) | '['"
       },
       {
         "car_id": "CAR-2021-11-001",
-        "error": "Line 2: Expected LPAREN(None) but got ID(command_line) | 'command_line'"
+        "error": "Line 2: Expected RPAREN(None) but got ID(reg_keys) | 'reg_keys'"
       },
       {
         "car_id": "CAR-2021-11-002",
-        "error": "Line 2: Expected LPAREN(None) but got ID(command_line) | 'command_line'"
+        "error": "Line 2: Expected RPAREN(None) but got STAR(*) | '*'"
       },
       {
         "car_id": "CAR-2021-12-001",
-        "error": "Line 2: Expected LPAREN(None) but got ID(command_line) | 'command_line'"
+        "error": "Line 3: Expected RPAREN(None) but got ID(tasks) | 'tasks'"
       },
       {
         "car_id": "CAR-2021-12-002",
-        "error": "Line 2: Expected STRING(None) but got LPAREN(() | '('"
+        "error": "Line 2: Expected RPAREN(None) but got STAR(*) | '*'"
       },
       {
         "car_id": "CAR-2022-03-001",
-        "error": "Line 2: Expected STRING(None) but got LPAREN(() | '('"
+        "error": "Line 2: Expected RPAREN(None) but got STAR(*) | '*'"
       }
     ],
-    "parse_rate": 50.9,
+    "parse_rate": 56.1,
     "translate_rate": 100.0,
-    "accuracy": 55.2
+    "accuracy": 56.2
   },
   "results": {
     "CAR-2013-05-004": {
@@ -262,7 +250,7 @@
     "CAR-2016-03-002": {
       "car_id": "CAR-2016-03-002",
       "parse": "OK",
-      "translate": "index=__your_sysmon_index__ EventCode=1\nImage=\"wmic.exe\" CommandLine=\"* process call create *\" CommandLine=\"* /node:*\"\n| table ComputerName, User, Image, ParentImage, CommandLine",
+      "translate": "index=__your_sysmon_index__ EventCode=1\nImage=\"wmic.exe\" CommandLine=\"* process call create *\" CommandLine=\"* /node:Create\"\n| table ComputerName, User, Image, ParentImage, CommandLine",
       "score": {
         "exact_match": false,
         "field_match": true,
@@ -332,12 +320,27 @@
     },
     "CAR-2019-07-001": {
       "car_id": "CAR-2019-07-001",
-      "parse": "FAIL: Line 2: Expected LPAREN(None) but got ID(command_line) | 'command_line'",
-      "translate": null,
+      "parse": "OK",
+      "translate": "index=__your_sysmon_index__ EventCode=1\nCommandLine=\"chmod *\"\n| table ComputerName, User, Image, ParentImage, CommandLine",
       "score": {
-        "score": 0,
-        "reason": "parse_error"
-      }
+        "exact_match": false,
+        "field_match": true,
+        "field_overlap": 1.0,
+        "structure_match": false,
+        "score": 1,
+        "gen_fields": [
+          "CommandLine",
+          "ComputerName",
+          "EventCode",
+          "Image",
+          "ParentImage",
+          "User"
+        ],
+        "ref_fields": [
+          "EventCode"
+        ]
+      },
+      "reference": "index=__your_windows_security_log_index__ EventCode=4670 Object_Type=\"File\" Security_ID!=\"NT AUTHORITY\\\\SYSTEM\""
     },
     "CAR-2019-07-002": {
       "car_id": "CAR-2019-07-002",
@@ -467,13 +470,13 @@
     "CAR-2020-09-002": {
       "car_id": "CAR-2020-09-002",
       "parse": "OK",
-      "translate": "index=__your_sysmon_index__ EventCode=13 OR EventCode=12\nTargetObject=\"*\\Software\\Classes\\CLSID\\*\"\n| table ComputerName, Image, TargetObject, Details",
+      "translate": "index=__your_sysmon_index__ EventCode=12 OR EventCode=13\nTargetObject=\"*\\Software\\Classes\\CLSID\\*\"\n| table ComputerName, Image, TargetObject, Details",
       "score": {
         "exact_match": false,
         "field_match": true,
         "field_overlap": 1.0,
-        "structure_match": false,
-        "score": 1,
+        "structure_match": true,
+        "score": 2,
         "gen_fields": [
           "ComputerName",
           "Details",
@@ -542,13 +545,13 @@
     "CAR-2020-09-005": {
       "car_id": "CAR-2020-09-005",
       "parse": "OK",
-      "translate": "index=__your_sysmon_index__ EventCode=13 OR EventCode=12\n(TargetObject=\"*\\SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Windows\\Appinit_Dlls\\*\" OR TargetObject=\"*\\SOFTWARE\\\\Wow6432Node\\Microsoft\\Windows NT\\CurrentVersion\\Windows\\Appinit_Dlls\\*\")\n| table ComputerName, Image, TargetObject, Details",
+      "translate": "index=__your_sysmon_index__ EventCode=12 OR EventCode=13\n(TargetObject=\"*\\SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Windows\\Appinit_Dlls\\*\" OR TargetObject=\"*\\SOFTWARE\\\\Wow6432Node\\Microsoft\\Windows NT\\CurrentVersion\\Windows\\Appinit_Dlls\\*\")\n| table ComputerName, Image, TargetObject, Details",
       "score": {
         "exact_match": false,
         "field_match": true,
         "field_overlap": 1.0,
-        "structure_match": false,
-        "score": 1,
+        "structure_match": true,
+        "score": 2,
         "gen_fields": [
           "ComputerName",
           "Details",
@@ -836,12 +839,25 @@
     },
     "CAR-2021-04-001": {
       "car_id": "CAR-2021-04-001",
-      "parse": "FAIL: Line 1: Expected ID(None) but got STAR(*) | '*'",
-      "translate": null,
+      "parse": "OK",
+      "translate": "index=__your_sysmon_index__ EventCode=1\n(((((((((Image=\"svchost.exe\" (Image!=\"C:\\\\Windows\\\\System32\\\\svchost.exe\" OR process_path!=\"C:\\\\Windows\\\\SysWow64\\\\svchost.exe\") OR Image=\"smss.exe\" Image!=\"C:\\\\Windows\\\\System32\\\\smss.exe\") OR Image=\"wininit.exe\" Image!=\"C:\\\\Windows\\\\System32\\\\wininit.exe\") OR Image=\"taskhost.exe\" Image!=\"C:\\\\Windows\\\\System32\\\\taskhost.exe\") OR Image=\"lasass.exe\" Image!=\"C:\\\\Windows\\\\System32\\\\lsass.exe\") OR Image=\"winlogon.exe\" Image!=\"C:\\\\Windows\\\\System32\\\\winlogon.exe\") OR Image=\"csrss.exe\" Image!=\"C:\\\\Windows\\\\System32\\\\csrss.exe\") OR Image=\"services.exe\" Image!=\"C:\\\\Windows\\\\System32\\\\services.exe\") OR Image=\"lsm.exe\" Image!=\"C:\\\\Windows\\\\System32\\\\lsm.exe\") OR Image=\"explorer.exe\" Image!=\"C:\\\\Windows\\\\explorer.exe\")\n| table ComputerName, User, Image, ParentImage, CommandLine",
       "score": {
+        "exact_match": false,
+        "field_match": false,
+        "field_overlap": 0.0,
+        "structure_match": false,
         "score": 0,
-        "reason": "parse_error"
-      }
+        "gen_fields": [
+          "CommandLine",
+          "ComputerName",
+          "EventCode",
+          "Image",
+          "ParentImage",
+          "User"
+        ],
+        "ref_fields": []
+      },
+      "reference": "index=__your_sysmon_index__ source=\"XmlWinEventLog:Microsoft-Windows-Sysmon/Operational\" AND (\n(process_name=svchost.exe AND NOT (process_path=\"C:\\\\Windows\\\\System32\\\\svchost.exe\" OR process_path=\"C:\\\\Windows\\\\SysWow64\\\\svchost.exe\"))\nOR (process_name=smss.exe AND NOT process_path=\"C:\\\\Windows\\\\System32\\\\smss.exe\")\nOR (process_name=wininit.exe AND NOT process_path=\"C:\\\\Windows\\\\System32\\\\wininit.exe\")\nOR (process_name=taskhost.exe AND NOT process_path=\"C:\\\\Windows\\\\System32\\\\taskhost.exe\")\nOR (process_name=lasass.exe AND NOT process_path=\"C:\\\\Windows\\\\System32\\\\lsass.exe\")\nOR (process_name=winlogon.exe AND NOT process_path=\"C:\\\\Windows\\\\System32\\\\winlogon.exe\")\nOR (process_name=csrss.exe AND NOT process_path=\"C:\\\\Windows\\\\System32\\\\csrss.exe\")\nOR (process_name=services.exe AND NOT process_path=\"C:\\\\Windows\\\\System32\\\\services.exe\")\nOR (process_name=lsm.exe AND NOT process_path=\"C:\\\\Windows\\\\System32\\\\lsm.exe\")\nOR (process_name=explorer.exe AND NOT process_path=\"C:\\\\Windows\\\\explorer.exe\")\n)"
     },
     "CAR-2021-05-001": {
       "car_id": "CAR-2021-05-001",
@@ -914,7 +930,7 @@
     },
     "CAR-2021-05-004": {
       "car_id": "CAR-2021-05-004",
-      "parse": "FAIL: Line 2: Expected RPAREN(None) but got ID(includes) | 'includes'",
+      "parse": "FAIL: Line 2: Expected [ or ( for value list | ''",
       "translate": null,
       "score": {
         "score": 0,
@@ -1028,16 +1044,32 @@
     },
     "CAR-2021-05-010": {
       "car_id": "CAR-2021-05-010",
-      "parse": "FAIL: Line 2: Expected RPAREN(None) but got COLON(:) | ':'",
-      "translate": null,
+      "parse": "OK",
+      "translate": "index=__your_sysmon_index__ EventCode=1\n(Image=\"C:\\Windows\\System32\\net.exe\" OR Image=\"C:\\Windows\\System32\\net1.exe\") ((CommandLine=\"*localgroup*\" OR CommandLine=\"*/add*\") OR CommandLine=\"*user*\")\n| table ComputerName, User, Image, ParentImage, CommandLine",
       "score": {
-        "score": 0,
-        "reason": "parse_error"
-      }
+        "exact_match": false,
+        "field_match": true,
+        "field_overlap": 1.0,
+        "structure_match": false,
+        "score": 1,
+        "gen_fields": [
+          "CommandLine",
+          "ComputerName",
+          "EventCode",
+          "Image",
+          "ParentImage",
+          "User",
+          "user"
+        ],
+        "ref_fields": [
+          "user"
+        ]
+      },
+      "reference": "| tstats count values(Processes.user) as user values(Processes.parent_process) as parent_process min(_time) as firstTime max(_time) as lastTime from datamodel=Endpoint.Processes where (Processes.process_name=net.exe OR Processes.process_name=net1.exe) AND (Processes.process=*localgroup* OR Processes.process=*/add* OR Processes.process=*user*) by Processes.process Processes.process_name Processes.dest   |`create_local_admin_accounts_using_net_exe_filter`"
     },
     "CAR-2021-05-011": {
       "car_id": "CAR-2021-05-011",
-      "parse": "FAIL: Line 2: Expected LPAREN(None) but got STRING(\"lsass\") | '\"lsass\"'",
+      "parse": "FAIL: Line 2: Expected ID(None) but got STRING(\"lsass\") | '\"lsass\"'",
       "translate": null,
       "score": {
         "score": 0,
@@ -1046,7 +1078,7 @@
     },
     "CAR-2021-05-012": {
       "car_id": "CAR-2021-05-012",
-      "parse": "FAIL: Line 2: Expected LPAREN(None) but got ID(image_path) | 'image_path'",
+      "parse": "FAIL: Line 2: Expected value, got LBRACKET([) | '['",
       "translate": null,
       "score": {
         "score": 0,
@@ -1055,7 +1087,7 @@
     },
     "CAR-2021-11-001": {
       "car_id": "CAR-2021-11-001",
-      "parse": "FAIL: Line 2: Expected LPAREN(None) but got ID(command_line) | 'command_line'",
+      "parse": "FAIL: Line 2: Expected RPAREN(None) but got ID(reg_keys) | 'reg_keys'",
       "translate": null,
       "score": {
         "score": 0,
@@ -1064,7 +1096,7 @@
     },
     "CAR-2021-11-002": {
       "car_id": "CAR-2021-11-002",
-      "parse": "FAIL: Line 2: Expected LPAREN(None) but got ID(command_line) | 'command_line'",
+      "parse": "FAIL: Line 2: Expected RPAREN(None) but got STAR(*) | '*'",
       "translate": null,
       "score": {
         "score": 0,
@@ -1073,7 +1105,7 @@
     },
     "CAR-2021-12-001": {
       "car_id": "CAR-2021-12-001",
-      "parse": "FAIL: Line 2: Expected LPAREN(None) but got ID(command_line) | 'command_line'",
+      "parse": "FAIL: Line 3: Expected RPAREN(None) but got ID(tasks) | 'tasks'",
       "translate": null,
       "score": {
         "score": 0,
@@ -1082,7 +1114,7 @@
     },
     "CAR-2021-12-002": {
       "car_id": "CAR-2021-12-002",
-      "parse": "FAIL: Line 2: Expected STRING(None) but got LPAREN(() | '('",
+      "parse": "FAIL: Line 2: Expected RPAREN(None) but got STAR(*) | '*'",
       "translate": null,
       "score": {
         "score": 0,
@@ -1091,7 +1123,7 @@
     },
     "CAR-2022-03-001": {
       "car_id": "CAR-2022-03-001",
-      "parse": "FAIL: Line 2: Expected STRING(None) but got LPAREN(() | '('",
+      "parse": "FAIL: Line 2: Expected RPAREN(None) but got STAR(*) | '*'",
       "translate": null,
       "score": {
         "score": 0,
