@@ -140,21 +140,38 @@ def _fix_filter_without_parens(text: str) -> str:
 
 
 def _fix_missing_close_paren(text: str) -> str:
-    """Insert missing closing paren before 'output' when filter is unclosed.
+    """Insert missing closing paren before 'output' keyword.
 
-    Handles: filter X where (...conditions...\noutput X
-    Should be: filter X where (...conditions...)\noutput X
+    Handles two cases:
+    1. 'output' joined mid-line due to continuation joining (most common)
+    2. 'output' on its own line after unclosed filter
     """
+    # Case 1: 'output' joined mid-line after unclosed filter condition
+    # Only match when there are unclosed parens before 'output'
     lines = text.split("\n")
     result = []
-    for i, line in enumerate(lines):
+    for line in lines:
+        # Check if line contains 'output' mid-line with unclosed parens before it
+        m = re.search(r'\boutput\s+\w', line)
+        if m and not line.strip().startswith('output'):
+            before = line[:m.start()]
+            after = line[m.start():]
+            open_count = before.count('(') - before.count(')')
+            if open_count > 0:
+                line = before + ')' * open_count + '\n' + after
+        result.append(line)
+
+    text = "\n".join(result)
+
+    # Case 2: 'output' on next line after unclosed parens
+    lines = text.split("\n")
+    result = []
+    for line in lines:
         stripped = line.strip()
-        # If this line starts with 'output' and previous line has unclosed parens
         if stripped.startswith('output') and result:
             prev = result[-1]
             open_count = prev.count('(') - prev.count(')')
             if open_count > 0:
-                # Add missing close parens to previous line
                 result[-1] = prev + ')' * open_count
         result.append(line)
     return "\n".join(result)

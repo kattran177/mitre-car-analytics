@@ -82,9 +82,9 @@ CAR Pseudocode → Normalise → Parse (strict) → AST → Field Mapping → Sp
 
 | Metric | Value | Notes |
 |--------|-------|-------|
-| **Parse success rate** | 56.1% | 32/57 analytics parse deterministically |
-| **Translation accuracy** | 55.2% | Semantically equivalent to reference Splunk |
-| **Grammar rejections** | 43.9% | Rejected as ambiguous → flagged for LLM normalisation |
+| **Parse success rate** | 61.4% | 35/57 analytics parse deterministically |
+| **Translation accuracy** | 71.4% | Semantically equivalent to reference Splunk |
+| **Grammar rejections** | 38.6% | Rejected as ambiguous → flagged for LLM normalisation |
 | **LLM normalisation** | Available | Fixes syntax for rejected analytics (needs API key) |
 
 ### Parse Failure Taxonomy

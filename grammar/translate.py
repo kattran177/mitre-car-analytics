@@ -23,6 +23,7 @@ FIELD_MAP = {
     # File:Create (EventCode=11)
     "file_path": "TargetFilename",
     "file_name": "TargetFilename",
+    "extension": "TargetFilename",
     # Module:Load (EventCode=7)
     "module_path": "ImageLoaded",
     "signer": "Signed",
@@ -221,3 +222,210 @@ def _translate_user_session(ast: list[dict]) -> str:
             parts.append(cond)
     parts.append("| table ComputerName, Account, LogonType, SourceNetworkAddress")
     return "\n".join(parts)
+
+
+# === KQL TRANSLATION ===
+
+# CAR field → KQL (Microsoft Defender/Sentinel) field mapping
+KQL_FIELD_MAP = {
+    "exe": "FileName",
+    "parent_exe": "InitiatingProcessFileName",
+    "command_line": "ProcessCommandLine",
+    "hostname": "DeviceName",
+    "image_path": "FolderPath",
+    "parent_image_path": "InitiatingProcessFolderPath",
+    "ppid": "InitiatingProcessId",
+    "pid": "ProcessId",
+    "user": "AccountName",
+    "file_path": "FolderPath",
+    "file_name": "FileName",
+    "dest_port": "RemotePort",
+    "src_port": "LocalPort",
+    "dest_ip": "RemoteIP",
+    "src_ip": "LocalIP",
+    "key": "RegistryKey",
+    "module_path": "FileName",
+}
+
+KQL_MODEL_TABLE = {
+    ("Process", "Create"): "DeviceProcessEvents",
+    ("File", "Create"): "DeviceFileEvents",
+    ("File", "Modify"): "DeviceFileEvents",
+    ("Registry", "Create"): "DeviceRegistryEvents",
+    ("Registry", "Edit"): "DeviceRegistryEvents",
+    ("Network", "Connect"): "DeviceNetworkEvents",
+    ("Flow", "Start"): "DeviceNetworkEvents",
+    ("Flow", "Message"): "DeviceNetworkEvents",
+    ("Module", "Load"): "DeviceImageLoadEvents",
+}
+
+
+def ast_to_kql(ast: list[dict]) -> str | None:
+    """Convert parsed AST to KQL (Microsoft Defender/Sentinel)."""
+    search_stmts = [s for s in ast if s["type"] == "search"]
+    filter_stmts = [s for s in ast if s["type"] == "filter"]
+
+    if not search_stmts:
+        return None
+
+    model = search_stmts[0]["models"][0]
+    obj = model.get("object", "")
+    action = model.get("action", "")
+    table = KQL_MODEL_TABLE.get((obj, action))
+    if not table:
+        return None
+
+    parts = [table]
+
+    for filt in filter_stmts:
+        kql_cond = _condition_to_kql(filt["condition"])
+        if kql_cond:
+            parts.append(f"| where {kql_cond}")
+
+    parts.append(f"| project {', '.join(_kql_default_fields(obj))}")
+    return "\n".join(parts)
+
+
+def _condition_to_kql(cond: dict) -> str:
+    """Convert condition AST to KQL where clause."""
+    op = cond.get("op")
+
+    if op == "and":
+        return f"{_condition_to_kql(cond['left'])} and {_condition_to_kql(cond['right'])}"
+    if op == "or":
+        return f"({_condition_to_kql(cond['left'])} or {_condition_to_kql(cond['right'])})"
+    if op == "not":
+        return f"not({_condition_to_kql(cond['operand'])})"
+    if op == "==":
+        field = _kql_map_field(cond["field"])
+        value = cond["value"]
+        if isinstance(value, str) and "*" in value:
+            pattern = value.replace("*", "")
+            return f'{field} contains "{pattern}"'
+        return f'{field} == "{value}"'
+    if op == "!=":
+        field = _kql_map_field(cond["field"])
+        return f'{field} != "{cond["value"]}"'
+    if op == "match":
+        field = _kql_map_field(cond["field"])
+        return f'{field} matches regex "{cond["pattern"]}"'
+    return ""
+
+
+def _kql_map_field(field: str) -> str:
+    parts = field.split(".")
+    return KQL_FIELD_MAP.get(parts[-1], parts[-1])
+
+
+def _kql_default_fields(obj: str) -> list[str]:
+    if obj == "Process":
+        return ["DeviceName", "AccountName", "FileName", "InitiatingProcessFileName", "ProcessCommandLine"]
+    if obj == "File":
+        return ["DeviceName", "FileName", "FolderPath", "InitiatingProcessFileName"]
+    if obj == "Registry":
+        return ["DeviceName", "RegistryKey", "RegistryValueName", "InitiatingProcessFileName"]
+    return ["DeviceName", "FileName"]
+
+
+# === SIGMA TRANSLATION ===
+
+SIGMA_FIELD_MAP = {
+    "exe": "Image",
+    "parent_exe": "ParentImage",
+    "command_line": "CommandLine",
+    "image_path": "Image",
+    "parent_image_path": "ParentImage",
+    "file_path": "TargetFilename",
+    "file_name": "TargetFilename",
+    "key": "TargetObject",
+    "module_path": "ImageLoaded",
+    "dest_port": "DestinationPort",
+    "user": "User",
+}
+
+SIGMA_CATEGORY = {
+    ("Process", "Create"): ("windows", "process_creation"),
+    ("File", "Create"): ("windows", "file_event"),
+    ("Registry", "Create"): ("windows", "registry_event"),
+    ("Registry", "Edit"): ("windows", "registry_event"),
+    ("Module", "Load"): ("windows", "image_load"),
+    ("Network", "Connect"): ("windows", "network_connection"),
+}
+
+
+def ast_to_sigma(ast: list[dict]) -> str | None:
+    """Convert parsed AST to Sigma rule YAML format."""
+    search_stmts = [s for s in ast if s["type"] == "search"]
+    filter_stmts = [s for s in ast if s["type"] == "filter"]
+
+    if not search_stmts:
+        return None
+
+    model = search_stmts[0]["models"][0]
+    obj = model.get("object", "")
+    action = model.get("action", "")
+    cat = SIGMA_CATEGORY.get((obj, action))
+    if not cat:
+        return None
+
+    product, category = cat
+
+    # Build detection section
+    selection = {}
+    filters = {}
+    for filt in filter_stmts:
+        _sigma_extract_conditions(filt["condition"], selection, filters)
+
+    lines = [
+        "title: Auto-generated from CAR pseudocode",
+        "status: experimental",
+        "logsource:",
+        f"    product: {product}",
+        f"    category: {category}",
+        "detection:",
+        "    selection:",
+    ]
+    for field, values in selection.items():
+        if len(values) == 1:
+            lines.append(f"        {field}: '{values[0]}'")
+        else:
+            lines.append(f"        {field}:")
+            for v in values:
+                lines.append(f"            - '{v}'")
+
+    if filters:
+        lines.append("    filter:")
+        for field, values in filters.items():
+            if len(values) == 1:
+                lines.append(f"        {field}: '{values[0]}'")
+            else:
+                lines.append(f"        {field}:")
+                for v in values:
+                    lines.append(f"            - '{v}'")
+        lines.append("    condition: selection and not filter")
+    else:
+        lines.append("    condition: selection")
+
+    return "\n".join(lines)
+
+
+def _sigma_extract_conditions(cond: dict, selection: dict, filters: dict):
+    """Recursively extract conditions into Sigma selection/filter dicts."""
+    op = cond.get("op")
+    if op == "and":
+        _sigma_extract_conditions(cond["left"], selection, filters)
+        _sigma_extract_conditions(cond["right"], selection, filters)
+    elif op == "or":
+        _sigma_extract_conditions(cond["left"], selection, filters)
+        _sigma_extract_conditions(cond["right"], selection, filters)
+    elif op == "==":
+        field = SIGMA_FIELD_MAP.get(cond["field"].split(".")[-1], cond["field"])
+        value = cond["value"] if isinstance(cond["value"], str) else str(cond["value"])
+        selection.setdefault(field, []).append(value)
+    elif op == "!=":
+        field = SIGMA_FIELD_MAP.get(cond["field"].split(".")[-1], cond["field"])
+        value = cond["value"] if isinstance(cond["value"], str) else str(cond["value"])
+        filters.setdefault(field, []).append(value)
+    elif op == "match":
+        field = SIGMA_FIELD_MAP.get(cond["field"].split(".")[-1], cond["field"])
+        selection.setdefault(field, []).append(f'*{cond["pattern"]}*')

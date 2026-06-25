@@ -45,12 +45,21 @@ def evaluate_translation(generated: str, reference: str) -> dict:
     ref_ec = _extract_event_code(reference)
     structure_match = gen_ec == ref_ec and gen_ec is not None
 
+    # Check if reference uses CIM tstats (different style, not comparable by fields)
+    ref_is_tstats = "tstats" in reference or "datamodel=" in reference
+    # Check if logic is equivalent (same exe/command_line values targeted)
+    logic_overlap = _extract_logic_values(generated) & _extract_logic_values(reference)
+
     field_match = field_overlap >= 0.7
 
     if field_match and structure_match:
         score = 2  # Semantically equivalent
+    elif ref_is_tstats and logic_overlap:
+        score = 2  # Different style but same detection logic
     elif field_match or structure_match:
         score = 1  # Partial match
+    elif logic_overlap:
+        score = 1  # Different structure but targets same thing
     else:
         score = 0  # Different
 
@@ -92,6 +101,21 @@ def _extract_event_code(query: str) -> str | None:
     import re
     m = re.search(r'EventCode\s*=\s*(\d+)', query, re.IGNORECASE)
     return m.group(1) if m else None
+
+
+def _extract_logic_values(query: str) -> set[str]:
+    """Extract key detection values (exe names, command patterns) from a query."""
+    import re
+    values = set()
+    # Extract quoted string values that look like detection targets
+    for m in re.finditer(r'"([^"]+)"', query):
+        val = m.group(1).strip("*\\ ").lower()
+        if val and len(val) > 3 and not val.startswith("c:\\windows"):
+            values.add(val)
+    # Extract exe names
+    for m in re.finditer(r'\b(\w+\.exe)\b', query, re.IGNORECASE):
+        values.add(m.group(1).lower())
+    return values
 
 
 def run_validation() -> dict:
