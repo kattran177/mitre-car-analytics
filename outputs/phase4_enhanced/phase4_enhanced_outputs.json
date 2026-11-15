@@ -1,0 +1,207 @@
+{
+  "CAR-2013-01-003": {
+    "summary_explanation": {
+      "summary": "CAR-2013-01-003 detects SMB write operations to remote file shares, which are commonly associated with lateral movement techniques such as PsExec, remote service installation, and ransomware propagation. The analytic monitors network flows on port 445 using the SMB protocol and captures the file name being written.",
+      "confidence": "high",
+      "reasoning": "SMB writes to remote hosts are a reliable indicator of lateral movement or staging activity. While legitimate in enterprise environments, the combination of destination port 445, SMB protocol, and outbound file writes provides high-fidelity signal when baselined against normal administrative behaviour."
+    },
+    "attack_mapping": {
+      "techniques": [
+        {
+          "technique_id": "T1021.002",
+          "technique_name": "Remote Services: SMB/Windows Admin Shares",
+          "subtechnique_id": "T1021.002",
+          "subtechnique_name": "SMB/Windows Admin Shares",
+          "tactic_names": ["Lateral Movement"],
+          "confidence": "high",
+          "rationale": "Writing files over SMB to admin shares (C$, ADMIN$, IPC$) is a primary mechanism for lateral movement tools such as PsExec and Impacket."
+        },
+        {
+          "technique_id": "T1570",
+          "technique_name": "Lateral Tool Transfer",
+          "subtechnique_id": null,
+          "subtechnique_name": null,
+          "tactic_names": ["Lateral Movement"],
+          "confidence": "medium",
+          "rationale": "Adversaries transfer tools or payloads to remote systems via SMB shares as a precursor to execution on those systems."
+        }
+      ]
+    },
+    "hunting_hypothesis": {
+      "question": "If an adversary is performing lateral movement via SMB, then we would expect to see outbound SMB writes (port 445) from workstations to other internal hosts outside of normal patching or backup windows.",
+      "confidence": "high",
+      "testable": true,
+      "rationale": "The hypothesis is testable by correlating SMB flow data with asset inventory, time-of-day baselines, and known admin activity schedules."
+    },
+    "siem_query": {
+      "platform": "splunk",
+      "confidence": "high",
+      "query": "index=network sourcetype=netflow dest_port=445 protocol=smb\n| stats count by src_ip, dest_ip, file_name\n| where count > 5\n| lookup asset_inventory ip as src_ip OUTPUT is_server\n| where is_server=false",
+      "data_model_fields_used": ["dest_port", "protocol", "src_ip", "dest_ip", "file_name"],
+      "caveats": "Tune the count threshold based on environment. Exclude known backup and patch management systems.",
+      "validation_issues": []
+    },
+    "false_positives": {
+      "risk_level": "medium",
+      "confidence": "high",
+      "scenarios": [
+        "Scheduled backup jobs writing to network shares",
+        "Software deployment tools (SCCM, Ansible) pushing updates",
+        "File synchronisation services (DFS Replication)",
+        "Legitimate administrative use of PsExec by IT staff"
+      ],
+      "explanation": "SMB writes are common in enterprise environments. Alert fidelity improves significantly when filtered to non-server source hosts outside business hours.",
+      "triage_filters": [
+        "dest_ip NOT IN (backup_server_list)",
+        "src_ip NOT IN (patch_management_list)",
+        "time_of_day BETWEEN '08:00' AND '18:00'"
+      ]
+    }
+  },
+  "CAR-2013-02-003": {
+    "summary_explanation": {
+      "summary": "CAR-2013-02-003 detects the creation of cmd.exe processes, which is a common indicator of command-line activity initiated by malware, scripts, or adversaries conducting hands-on-keyboard operations. The analytic captures all cmd.exe process creation events.",
+      "confidence": "medium",
+      "reasoning": "While cmd.exe is used legitimately by administrators and applications, its unexpected presence in user sessions, spawned by unusual parent processes, or at unusual times is a reliable early indicator of adversary activity."
+    },
+    "attack_mapping": {
+      "techniques": [
+        {
+          "technique_id": "T1059.003",
+          "technique_name": "Command and Scripting Interpreter: Windows Command Shell",
+          "subtechnique_id": "T1059.003",
+          "subtechnique_name": "Windows Command Shell",
+          "tactic_names": ["Execution"],
+          "confidence": "high",
+          "rationale": "cmd.exe is the native Windows command shell. Adversaries use it to execute commands, run scripts, and chain tool execution during post-exploitation."
+        }
+      ]
+    },
+    "hunting_hypothesis": {
+      "question": "If an adversary is using the Windows command shell for execution, then we would expect to see cmd.exe spawned by unusual parent processes (e.g., Office applications, browsers, or services) or by user accounts that do not normally use the command line.",
+      "confidence": "high",
+      "testable": true,
+      "rationale": "Parent-child process relationships provide strong context. cmd.exe spawned by winword.exe or chrome.exe is highly anomalous and testable against process creation logs."
+    },
+    "siem_query": {
+      "platform": "splunk",
+      "confidence": "high",
+      "query": "index=sysmon EventCode=1 Image=\"*\\cmd.exe\"\n| stats count by ParentImage, User, ComputerName\n| where NOT match(ParentImage, \"explorer\\.exe|conhost\\.exe|cmd\\.exe\")\n| sort -count",
+      "data_model_fields_used": ["Image", "ParentImage", "User", "ComputerName", "EventCode"],
+      "caveats": "High-volume in developer environments. Baseline normal parent processes before alerting.",
+      "validation_issues": []
+    },
+    "false_positives": {
+      "risk_level": "high",
+      "confidence": "high",
+      "scenarios": [
+        "Developers and system administrators running command-line tools",
+        "Build systems and CI/CD pipelines executing shell commands",
+        "Legitimate scripts triggered by scheduled tasks",
+        "Software installers that spawn cmd.exe during installation"
+      ],
+      "explanation": "cmd.exe process creation is extremely common. The analytic requires enrichment with parent process, user context, and time-of-day to be actionable.",
+      "triage_filters": [
+        "ParentImage NOT IN ('explorer.exe', 'taskmgr.exe')",
+        "User NOT IN (admin_user_list)",
+        "NOT (CommandLine contains '/c echo' OR CommandLine contains 'setup')"
+      ]
+    }
+  },
+  "CAR-2014-02-001": {
+    "summary_explanation": {
+      "summary": "CAR-2014-02-001 detects services being created or modified on Windows systems, which is a common persistence and privilege escalation technique. Adversaries install malicious services to survive reboots or execute code with SYSTEM privileges.",
+      "confidence": "high",
+      "reasoning": "Service creation outside of software installation windows is anomalous. Malicious services often have randomised names, point to temp directories, or are created by non-administrative user accounts."
+    },
+    "attack_mapping": {
+      "techniques": [
+        {
+          "technique_id": "T1543.003",
+          "technique_name": "Create or Modify System Process: Windows Service",
+          "subtechnique_id": "T1543.003",
+          "subtechnique_name": "Windows Service",
+          "tactic_names": ["Persistence", "Privilege Escalation"],
+          "confidence": "high",
+          "rationale": "Creating a Windows service is a well-documented persistence mechanism used by APT groups, ransomware, and commodity malware to maintain access and run as SYSTEM."
+        }
+      ]
+    },
+    "hunting_hypothesis": {
+      "question": "If an adversary has installed a malicious Windows service for persistence, then we would expect to see service creation events (Event ID 7045) with binary paths pointing to unusual directories (Temp, AppData, ProgramData) or with randomly generated service names.",
+      "confidence": "high",
+      "testable": true,
+      "rationale": "Windows Event ID 7045 (Service Control Manager) logs all new service installations with binary path and account information, making this directly testable."
+    },
+    "siem_query": {
+      "platform": "splunk",
+      "confidence": "high",
+      "query": "index=wineventlog EventCode=7045\n| eval suspicious_path=if(match(ServiceFileName, \"(?i)(temp|appdata|programdata|users\\\\.*\\\\)\"), 1, 0)\n| where suspicious_path=1\n| table _time, ComputerName, ServiceName, ServiceFileName, ServiceAccount",
+      "data_model_fields_used": ["EventCode", "ServiceName", "ServiceFileName", "ServiceAccount", "ComputerName"],
+      "caveats": "Some legitimate software installs to AppData. Cross-reference with software deployment records.",
+      "validation_issues": []
+    },
+    "false_positives": {
+      "risk_level": "low",
+      "confidence": "high",
+      "scenarios": [
+        "Legitimate software installers that use AppData or ProgramData paths",
+        "Portable applications that register services from non-standard locations",
+        "Agent-based monitoring tools (EDR, AV) installed by IT"
+      ],
+      "explanation": "Service creation from temp or user-writable directories is rare in well-managed environments, making this a relatively high-fidelity detection with low false positive rate.",
+      "triage_filters": [
+        "ServiceFileName NOT IN (approved_software_paths)",
+        "AccountName NOT IN ('SYSTEM', 'LocalService', 'NetworkService')"
+      ]
+    }
+  },
+  "CAR-2019-04-001": {
+    "summary_explanation": {
+      "summary": "CAR-2019-04-001 detects credential dumping activity targeting the LSASS process, specifically through the use of MiniDump functionality. Adversaries dump LSASS memory to extract plaintext credentials, NTLM hashes, and Kerberos tickets for use in pass-the-hash or pass-the-ticket attacks.",
+      "confidence": "high",
+      "reasoning": "LSASS memory access from non-system processes is a highly reliable indicator of credential theft. Tools such as Mimikatz, ProcDump, and Cobalt Strike all access LSASS to harvest credentials."
+    },
+    "attack_mapping": {
+      "techniques": [
+        {
+          "technique_id": "T1003.001",
+          "technique_name": "OS Credential Dumping: LSASS Memory",
+          "subtechnique_id": "T1003.001",
+          "subtechnique_name": "LSASS Memory",
+          "tactic_names": ["Credential Access"],
+          "confidence": "high",
+          "rationale": "Direct memory access to lsass.exe for the purpose of extracting credentials is a primary technique used by both nation-state and criminal threat actors."
+        }
+      ]
+    },
+    "hunting_hypothesis": {
+      "question": "If an adversary is attempting to dump credentials from LSASS, then we would expect to see non-system processes requesting PROCESS_VM_READ access to lsass.exe, or the creation of LSASS memory dump files in user-accessible directories.",
+      "confidence": "high",
+      "testable": true,
+      "rationale": "Sysmon Event ID 10 (ProcessAccess) captures LSASS access events including the granted access mask, making this directly observable and testable."
+    },
+    "siem_query": {
+      "platform": "splunk",
+      "confidence": "high",
+      "query": "index=sysmon EventCode=10 TargetImage=\"*\\lsass.exe\"\n| where NOT match(SourceImage, \"(?i)(antivirus|edr|sysmon|csrss|wininit)\")\n| eval granted_access_hex=tonumber(GrantedAccess, 16)\n| where (granted_access_hex BAND 0x10) > 0 OR (granted_access_hex BAND 0x20) > 0\n| table _time, SourceImage, SourceUser, GrantedAccess, ComputerName",
+      "data_model_fields_used": ["TargetImage", "SourceImage", "GrantedAccess", "SourceUser", "ComputerName"],
+      "caveats": "Requires Sysmon with ProcessAccess logging enabled. Whitelist known security tools to reduce noise.",
+      "validation_issues": []
+    },
+    "false_positives": {
+      "risk_level": "low",
+      "confidence": "high",
+      "scenarios": [
+        "Endpoint security products (AV, EDR) that legitimately access LSASS for monitoring",
+        "Windows Defender Credential Guard validation processes",
+        "Debugging tools used by developers on development workstations"
+      ],
+      "explanation": "LSASS access from non-security processes is rare and highly suspicious. This detection has a low false positive rate when security tool paths are whitelisted.",
+      "triage_filters": [
+        "SourceImage NOT IN (security_tool_paths)",
+        "SourceUser NOT IN ('SYSTEM', 'LOCAL SERVICE')"
+      ]
+    }
+  }
+}
